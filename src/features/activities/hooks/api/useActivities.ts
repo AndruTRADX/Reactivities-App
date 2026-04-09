@@ -4,8 +4,6 @@ import agent from "@/shared/services/agent"
 import type { ActivityResponse } from "@activities/schemas/response/ActivityResponse"
 import type { ActivityRequest } from "@activities/schemas/request/ActivityRequest"
 
-
-
 export const useGetActivities = () => {
   const { data, isPending } = useQuery<PagedResponse<ActivityResponse>>({
     queryKey: ["activities"],
@@ -18,6 +16,25 @@ export const useGetActivities = () => {
   return {
     pagedActivities: data,
     isPendingActivities: isPending,
+  }
+}
+
+export const useCreateActivity = () => {
+  const queryClient = useQueryClient()
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (activity: ActivityRequest) => {
+      await agent.post("/activities", activity)
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["activities"],
+      })
+    },
+  })
+
+  return {
+    createActivityAsync: mutateAsync,
+    isPendingCreateActivity: isPending,
   }
 }
 
