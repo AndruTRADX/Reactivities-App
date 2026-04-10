@@ -56,3 +56,22 @@ export const useUpdateActivity = () => {
     isPendingUpdateActivity: isPending,
   }
 }
+
+export const useDeleteActivity = () => {
+  const queryClient = useQueryClient()
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (id: string) => {
+      await agent.delete(`/activities/${id}`)
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["activities"],
+      })
+    },
+  })
+
+  return {
+    deleteActivityAsync: mutateAsync,
+    isPendingDeleteActivity: isPending,
+  }
+}
