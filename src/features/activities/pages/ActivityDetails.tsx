@@ -1,5 +1,5 @@
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import { Badge } from "@sharedUi/badge"
+import { Button } from "@sharedUi/button"
 import {
   Card,
   CardAction,
@@ -8,12 +8,12 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import type { ActivityResponseSchema } from "../schemas/response/ActivityResponse"
+} from "@sharedUi/card"
 import { format } from "date-fns"
+import type { ActivityResponse } from "../schemas/response/ActivityResponse"
 
 interface Props {
-  activity: ActivityResponseSchema
+  activity: ActivityResponse
 }
 
 export default function ActivityDetails({ activity }: Props) {

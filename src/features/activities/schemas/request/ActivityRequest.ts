@@ -1,4 +1,4 @@
-import { requiredString } from "@/lib/utils"
+import { requiredString } from "@/shared/lib/utils"
 import { z } from "zod"
 
 export const ActivityRequestSchema = z.object({

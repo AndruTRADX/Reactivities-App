@@ -5,14 +5,14 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import type { ActivityResponse } from "../schemas/response/ActivityResponse"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { useDeleteActivity } from "../hooks/api/useActivities"
+} from "@sharedUi/card"
+import { Badge } from "@sharedUi/badge"
+import { Button } from "@sharedUi/button"
+import { Spinner } from "@sharedUi/spinner"
+import type { ActivityResponse } from "@activities/schemas/response/ActivityResponse"
+import { useDeleteActivity } from "@activities/hooks/api/useActivities"
 import { toast } from "sonner"
-import { Spinner } from "@/components/ui/spinner"
-import { useConfirmDialog } from "@/shared/hooks/useConfirmDialog"
+import { useConfirmDialog } from "@sharedHooks/useConfirmDialog"
 
 interface Props {
   activity: ActivityResponse

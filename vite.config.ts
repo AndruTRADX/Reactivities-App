@@ -9,8 +9,11 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@components': path.resolve(__dirname, './src/components'),
       '@activities': path.resolve(__dirname, './src/features/activities'),
+      '@sharedUi': path.resolve(__dirname, './src/shared/components/ui'),
+      '@sharedForms': path.resolve(__dirname, './src/shared/components/forms'),
+      '@sharedHooks': path.resolve(__dirname, './src/shared/hooks'),
+      '@sharedSchemas': path.resolve(__dirname, './src/shared/schemas/'),
     }
   },
 })

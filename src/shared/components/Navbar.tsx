@@ -1,6 +1,6 @@
 import { UserSearch } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Button } from "../ui/button";
+import { Button } from "@sharedUi/button";
 
 
 export default function Navbar() {

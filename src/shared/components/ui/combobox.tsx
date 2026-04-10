@@ -1,17 +1,14 @@
-/* eslint-disable react-refresh/only-export-components */
-"use client"
-
 import * as React from "react"
 import { Combobox as ComboboxPrimitive } from "@base-ui/react"
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/shared/lib/utils"
+import { Button } from "@sharedUi/button"
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
-} from "@/components/ui/input-group"
+} from "@sharedUi/input-group"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowDown01Icon, Cancel01Icon, Tick02Icon } from "@hugeicons/core-free-icons"
 
