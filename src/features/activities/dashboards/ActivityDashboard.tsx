@@ -1,6 +1,6 @@
-import ActivityForm from "../forms/ActivityForm"
-import { useGetActivities } from "../hooks/api/useActivities"
-import ActivityCard from "./ActivityCard"
+import ActivityForm from "@activities/forms/ActivityForm"
+import { useGetActivities } from "@activities/hooks/api/useActivities"
+import ActivityCard from "@activities/dashboards/ActivityCard"
 
 export default function ActivityDashboard() {
   const { pagedActivities } = useGetActivities()

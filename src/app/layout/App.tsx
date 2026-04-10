@@ -1,5 +1,5 @@
-import { ConfirmDialog } from "@/components/shared/ConfirmDialog"
-import Navbar from "@/components/shared/Navbar"
+import { ConfirmDialog } from "@/shared/components/ConfirmDialog"
+import Navbar from "@/shared/components/Navbar"
 import ActivityPage from "@/features/activities/ActivityPage"
 
 function App() {

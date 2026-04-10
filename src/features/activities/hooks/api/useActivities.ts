@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import type { PagedResponse } from "@/shared/schemas/response/PagedResponse"
+import type { PagedResponse } from "@sharedSchemas/response/PagedResponse"
 import agent from "@/shared/services/agent"
 import type { ActivityResponse } from "@activities/schemas/response/ActivityResponse"
 import type { ActivityRequest } from "@activities/schemas/request/ActivityRequest"

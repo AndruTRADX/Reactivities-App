@@ -1,7 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import { useEffect, useMemo } from "react"
 
-import { Button } from "@/components/ui/button"
+import { AddSquareIcon, Edit01Icon } from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
+
+import { Button } from "@sharedUi/button"
 import {
   Card,
   CardContent,
@@ -9,17 +14,15 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import TextInput from "@/components/forms/TextInput"
-import { ActivityRequestSchema, type ActivityRequest } from "../schemas/request/ActivityRequest"
+} from "@sharedUi/card"
+import { Spinner } from "@sharedUi/spinner"
+import TextInput from "@sharedForms/TextInput"
+import DateInput from "@sharedForms/DateInput"
+
+import { ActivityRequestSchema, type ActivityRequest } from "@activities/schemas/request/ActivityRequest"
 import type { ActivityResponse } from "@activities/schemas/response/ActivityResponse"
 import { useCreateActivity, useUpdateActivity } from "@activities/hooks/api/useActivities"
-import { toast } from "sonner"
-import { useEffect, useMemo } from "react"
-import { Spinner } from "@/components/ui/spinner"
-import { AddSquareIcon, Edit01Icon } from "@hugeicons/core-free-icons"
-import { HugeiconsIcon } from "@hugeicons/react"
-import DateInput from "@/components/forms/DateInput"
+
 interface Props {
   activity: ActivityResponse
 }

@@ -7,8 +7,11 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"],
-      "@components/*": ["./src/components/*"],
-      "@activities/*": ["./src/features/activities/*"]
+      "@activities/*": ["./src/features/activities/*"],
+      "@sharedUi/*": ["./src/shared/components/ui/*"],
+      "@sharedForms/*": ["./src/shared/components/forms/*"],
+      "@sharedHooks/*": ["./src/shared/hooks/*"],
+      "@sharedSchemas/*": ["./src/shared/schemas/*"],
     }
   }
 }

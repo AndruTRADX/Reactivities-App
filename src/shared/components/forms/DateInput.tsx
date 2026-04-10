@@ -2,11 +2,11 @@ import { format } from "date-fns"
 import { Calendar as CalendarIcon } from "lucide-react"
 import { type FieldValues, useController, type UseControllerProps } from "react-hook-form"
 
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
+import { Button } from "@sharedUi/button"
+import { Calendar } from "@sharedUi/calendar"
+import { Field, FieldDescription, FieldError, FieldLabel } from "@sharedUi/field"
+import { Popover, PopoverContent, PopoverTrigger } from "@sharedUi/popover"
+import { cn } from "@/shared/lib/utils"
 
 type Props<T extends FieldValues> = {
   label?: string

@@ -1,7 +1,7 @@
 import { type FieldValues, useController, type UseControllerProps } from "react-hook-form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Field, FieldLabel, FieldDescription, FieldError } from "@/components/ui/field"
+import { Input } from "@sharedUi/input"
+import { Textarea } from "@sharedUi/textarea"
+import { Field, FieldLabel, FieldDescription, FieldError } from "@sharedUi/field"
 
 type Props<T extends FieldValues> = {
   label?: string

@@ -7,8 +7,8 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Button } from "@/components/ui/button"
+} from "@sharedUi/alert-dialog"
+import { Button } from "@sharedUi/button"
 import { useConfirmDialogStore } from "@/shared/stores/confirmDialogStore"
 
 export const ConfirmDialog = () => {
@@ -22,8 +22,15 @@ export const ConfirmDialog = () => {
           <AlertDialogDescription>{options.description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancel}>{options.cancelText}</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirm} asChild>
+          <AlertDialogCancel onClick={handleCancel} variant="default" size="default">
+            {options.cancelText}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleConfirm}
+            asChild
+            variant={options.confirmVariant}
+            size="default"
+          >
             <Button variant={options.confirmVariant}>{options.confirmText}</Button>
           </AlertDialogAction>
         </AlertDialogFooter>
