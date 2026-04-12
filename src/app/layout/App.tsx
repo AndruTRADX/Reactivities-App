@@ -1,6 +1,6 @@
 import { ConfirmDialog } from "@/shared/components/ConfirmDialog"
 import Navbar from "@/shared/components/Navbar"
-import ActivityPage from "@/features/activities/ActivityPage"
+import { Outlet } from "react-router"
 
 function App() {
   return (
@@ -8,7 +8,7 @@ function App() {
       <Navbar />
       <ConfirmDialog />
       <main className="pt-17 pb-6 px-5.5 bg-primary-foreground min-h-dvh">
-        <ActivityPage />
+        <Outlet />
       </main>
     </div>
   )

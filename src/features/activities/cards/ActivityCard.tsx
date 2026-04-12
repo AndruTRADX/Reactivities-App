@@ -1,6 +1,7 @@
 import {
   Card,
   CardAction,
+  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
@@ -13,6 +14,8 @@ import type { ActivityResponse } from "@activities/schemas/response/ActivityResp
 import { useDeleteActivity } from "@activities/hooks/api/useActivities"
 import { toast } from "sonner"
 import { useConfirmDialog } from "@sharedHooks/useConfirmDialog"
+import { useNavigate } from "react-router"
+import { format } from "date-fns"
 
 interface Props {
   activity: ActivityResponse
@@ -21,10 +24,9 @@ interface Props {
 export default function ActivityCard({ activity }: Props) {
   const { deleteActivityAsync, isPendingDeleteActivity } = useDeleteActivity()
   const { confirmDelete } = useConfirmDialog()
+  const navigate = useNavigate()
 
   const handleDelete = async () => {
-    console.log(activity.id)
-
     confirmDelete({
       description: `Delete activity "${activity.title}"? This action cannot be undone.`,
       onConfirm: async () => {
@@ -37,23 +39,20 @@ export default function ActivityCard({ activity }: Props) {
   }
 
   return (
-    <Card className="relative mx-auto w-full overflow-hidden pt-0" key={activity.id}>
-      <div className="relative aspect-video w-full max-h-42">
-        <div className="absolute inset-0 z-10 bg-black/35" />
-        <img
-          src={`/categoryImages/${activity.category}.jpg`}
-          alt="Event cover"
-          className="h-full w-full object-cover brightness-60 grayscale dark:brightness-40"
-        />
-      </div>
-
+    <Card className="mx-auto w-full overflow-hidden gap-3" key={activity.id}>
       <CardHeader>
         <CardAction>
           <Badge variant="secondary">{activity.category}</Badge>
         </CardAction>
         <CardTitle>{activity.title}</CardTitle>
-        <CardDescription>{activity.description}</CardDescription>
+        <CardDescription className="text-primary">
+          {format(activity.date, "yyyy/MM/dd/ hh:mm:ss")}
+        </CardDescription>
       </CardHeader>
+      <CardContent className="flex flex-col gap-2">
+        <p className="text-sm text-muted-foreground">{activity.description}</p>
+        <p className="text-sm">{`Place: ${activity?.city} - ${activity?.venue}`}</p>
+      </CardContent>
       <CardFooter className="flex justify-end gap-2">
         <Button variant="destructive" onClick={handleDelete} disabled={isPendingDeleteActivity}>
           {isPendingDeleteActivity ? (
@@ -64,7 +63,7 @@ export default function ActivityCard({ activity }: Props) {
             "Delete"
           )}
         </Button>
-        <Button className="">View Event</Button>
+        <Button onClick={() => navigate(`/activities/${activity.id}`)}>View Event</Button>
       </CardFooter>
     </Card>
   )
