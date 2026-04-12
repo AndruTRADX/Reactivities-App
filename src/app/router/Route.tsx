@@ -1,0 +1,36 @@
+import { createBrowserRouter } from "react-router"
+import App from "../layout/App"
+import HomePage from "@/features/home/HomePage"
+import ActivityPage from "@/features/activities/ActivityPage"
+import CreateActivityPage from "@/features/activities/pages/create/CreateActivityPage"
+import ActivityDetailsPage from "@/features/activities/pages/details/ActivityDetailsPage"
+import UpdateActivityPage from "@/features/activities/pages/update/UpdateActivityPage"
+
+export const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <App />,
+    children: [
+      {
+        path: "",
+        element: <HomePage />,
+      },
+      {
+        path: "activities",
+        element: <ActivityPage />,
+      },
+      {
+        path: "activities/:id",
+        element: <ActivityDetailsPage />,
+      },
+      {
+        path: "create-activity",
+        element: <CreateActivityPage />,
+      },
+      {
+        path: "update-activity/:id",
+        element: <UpdateActivityPage />,
+      },
+    ],
+  },
+])

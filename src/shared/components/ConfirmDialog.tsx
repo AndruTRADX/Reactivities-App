@@ -22,7 +22,7 @@ export const ConfirmDialog = () => {
           <AlertDialogDescription>{options.description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={handleCancel} variant="default" size="default">
+          <AlertDialogCancel onClick={handleCancel} variant="outline" size="default">
             {options.cancelText}
           </AlertDialogCancel>
           <AlertDialogAction

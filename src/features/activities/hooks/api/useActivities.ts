@@ -19,6 +19,22 @@ export const useGetActivities = () => {
   }
 }
 
+export const useGetActivityById = (id: string | undefined) => {
+  const { data, isPending } = useQuery<ActivityResponse>({
+    queryKey: ["activities", id],
+    queryFn: async () => {
+      const response = await agent.get<ActivityResponse>(`/activities/${id}`)
+      return response
+    },
+    enabled: !!id
+  })
+
+  return {
+    activity: data,
+    isPendingActivity: isPending,
+  }
+}
+
 export const useCreateActivity = () => {
   const queryClient = useQueryClient()
   const { mutateAsync, isPending } = useMutation({
