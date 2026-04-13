@@ -54,8 +54,7 @@ export default function ActivityDetailsPage() {
   }
 
   return (
-    <div className="flex w-full justify-center">
-      <div className=" w-full grid grid-cols-4 max-w-7xl gap-3 mt-4">
+    <div className="grid grid-cols-4 gap-4">
         <Card className="col-span-3 overflow-hidden pt-0">
           <div className="relative aspect-video w-full dark">
             <img
@@ -169,6 +168,5 @@ export default function ActivityDetailsPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
   )
 }

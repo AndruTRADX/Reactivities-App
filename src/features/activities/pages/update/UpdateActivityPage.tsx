@@ -22,7 +22,7 @@ export default function UpdateActivityPage() {
   }
 
   return (
-    <div className="flex justify-center mt-4">
+    <div className="flex justify-center">
       <ActivityForm activity={activity} />
     </div>
   )
