@@ -6,14 +6,14 @@ import { cn } from "../lib/utils"
 
 export default function Navbar() {
   return (
-    <nav className="z-50 fixed w-full flex justify-between px-5.5 py-2.5 bg-primary-foreground/50 backdrop-blur-xs border-b border-border">
+    <nav className="z-50 fixed w-full flex justify-between px-5.5 py-2.5 bg-primary-foreground/50 backdrop-blur-xs">
       <NavLink to="/" end>
         {({ isActive }) => (
           <Button
             size='lg'
             variant='ghost'
             className={cn(
-              `flex items-center gap-1 cursor-pointer ${isActive && "text-primary hover:text-primary/80"}`
+              `flex items-center gap-1 cursor-pointer ${isActive ? "text-primary hover:text-primary/80" : "text-foreground"}`
             )}
           >
             <HugeiconsIcon icon={UserSearch} strokeWidth={2}/>
@@ -27,7 +27,7 @@ export default function Navbar() {
           {({ isActive }) => (
             <Button
               variant="ghost"
-              className={cn(isActive && "text-primary hover:text-primary/80")}
+              className={cn(isActive ? "text-primary hover:text-primary/80" : "text-foreground")}
             >
               Activities
             </Button>
@@ -38,7 +38,7 @@ export default function Navbar() {
           {({ isActive }) => (
             <Button
               variant="ghost"
-              className={cn(isActive && "text-primary hover:text-primary/80")}
+              className={cn(isActive ? "text-primary hover:text-primary/80" : "text-foreground")}
             >
               Create Activity
             </Button>

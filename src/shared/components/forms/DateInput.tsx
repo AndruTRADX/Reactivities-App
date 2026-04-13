@@ -1,5 +1,6 @@
 import { format } from "date-fns"
-import { Calendar as CalendarIcon } from "lucide-react"
+import { Calendar01Icon } from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
 import { type FieldValues, useController, type UseControllerProps } from "react-hook-form"
 
 import { Button } from "@sharedUi/button"
@@ -40,7 +41,7 @@ export default function DateInput<T extends FieldValues>({
               !value && "text-muted-foreground"
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
+            <HugeiconsIcon icon={Calendar01Icon} className="mr-2 h-4 w-4" />
             {value ? format(value, "PPP") : <span>{placeholder}</span>}
           </Button>
         </PopoverTrigger>
