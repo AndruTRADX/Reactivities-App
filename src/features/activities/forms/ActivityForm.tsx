@@ -87,7 +87,7 @@ export default function ActivityForm({ activity }: Props) {
   }, [isPendingUpdateActivity, isPendingCreateActivity, !isValid])
 
   return (
-    <Card className="w-full sm:max-w-2xl">
+    <Card className="w-full sm:max-w-xl">
       <CardHeader>
         <CardTitle className="flex gap-2">
           {activity ? (
