@@ -1,5 +1,7 @@
 import axios, { type AxiosResponse, type AxiosError } from "axios"
 import type { ApiResponse } from "../schemas/response/ApiResponse"
+import type { ProblemDetailsResponse } from "../schemas/response/ProblemDetailsResponse"
+import { toast } from "sonner"
 
 declare module "axios" {
   export interface AxiosInstance {
@@ -32,9 +34,24 @@ agent.interceptors.response.use(
 
     return apiResponse.data as T
   },
-  (error: AxiosError) => {
-    console.error("Error en la petición:", error.message)
-    return Promise.reject(error)
+  <T>(error: AxiosError<ProblemDetailsResponse<T>>) => {
+    const { status } = error
+
+    switch(status) {
+      case 400:
+        toast.error("Bad request")
+        console.log(error)
+        break;
+      case 404:
+        toast.error("Not found")
+        console.log(error)
+        break;
+      default: 
+        return Promise.reject(error)
+    }
+    
+
+    return Promise.resolve(null)
   }
 )
 
