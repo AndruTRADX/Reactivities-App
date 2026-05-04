@@ -5,6 +5,8 @@ import ActivityPage from "@/features/activities/ActivityPage"
 import CreateActivityPage from "@/features/activities/pages/create/CreateActivityPage"
 import ActivityDetailsPage from "@/features/activities/pages/details/ActivityDetailsPage"
 import UpdateActivityPage from "@/features/activities/pages/update/UpdateActivityPage"
+import ServerErrorPage from "@/features/errors/ServerErrorPage"
+import NotFoundPage from "@/features/errors/NotFoundPage"
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +32,18 @@ export const router = createBrowserRouter([
       {
         path: "update-activity/:id",
         element: <UpdateActivityPage />,
+      },
+      {
+        path: "not-found",
+        element: <NotFoundPage />,
+      },
+      {
+        path: "server-error",
+        element: <ServerErrorPage />,
+      },
+      {
+        path: "*",
+        element: <NotFoundPage />,
       },
     ],
   },

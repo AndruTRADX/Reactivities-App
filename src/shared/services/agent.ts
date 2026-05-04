@@ -2,6 +2,7 @@ import axios, { type AxiosResponse, type AxiosError } from "axios"
 import type { ApiResponse } from "../schemas/response/ApiResponse"
 import type { ProblemDetailsResponse } from "../schemas/response/ProblemDetailsResponse"
 import { toast } from "sonner"
+import { router } from "@/app/router/Route"
 
 declare module "axios" {
   export interface AxiosInstance {
@@ -35,23 +36,50 @@ agent.interceptors.response.use(
     return apiResponse.data as T
   },
   <T>(error: AxiosError<ProblemDetailsResponse<T>>) => {
-    const { status } = error
-
-    switch(status) {
-      case 400:
-        toast.error("Bad request")
-        console.log(error)
-        break;
-      case 404:
-        toast.error("Not found")
-        console.log(error)
-        break;
-      default: 
-        return Promise.reject(error)
-    }
     
 
-    return Promise.resolve(null)
+    const status = error.response?.status
+    const title = error.response?.data?.title
+    const message = error.response?.data?.message
+    const errors = error.response?.data?.errors
+
+    switch (status) {
+      case 400:
+        if (errors && Object.keys(errors).length > 0) {
+          const errorLines: string[] = []
+          for (const [field, messages] of Object.entries(errors)) {
+            errorLines.push(`${field}:`)
+            messages.forEach(msg => errorLines.push(`  • ${msg}`))
+          }
+          const formattedError = errorLines.join("\n")
+
+          toast.error(`${title}: ${message}`, {
+            style: { whiteSpace: "pre-line" },
+            description: formattedError,
+            icon: null
+          })
+        } else {
+          toast.error(`${title}: ${message}`)
+        }
+        Promise.reject(error)
+        break 
+      case 401:
+        toast.error(`${title}: ${message}`)
+        Promise.reject(error)
+        break
+      case 404:
+        router.navigate('/not-found', { state: error.response?.data })
+        Promise.reject(error)
+        return
+      case 500:
+        router.navigate('/server-error', { state: error.response?.data })
+        Promise.reject(error)
+        return
+      default:
+        return Promise.reject(error)
+    }
+
+    return Promise.reject(null)
   }
 )
 
