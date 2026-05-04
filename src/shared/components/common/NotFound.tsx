@@ -19,10 +19,6 @@ export function NoContent({ title, description }: Props) {
           {description ?? "The content you are looking for has not been found"}
         </EmptyDescription>
       </EmptyHeader>
-      {/* <EmptyContent className="flex-row justify-center gap-2">
-        <Button>Create Project</Button>
-        <Button variant="outline">Import Project</Button>
-      </EmptyContent> */}
     </Empty>
   )
 }

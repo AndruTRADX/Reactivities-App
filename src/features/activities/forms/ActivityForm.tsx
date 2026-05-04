@@ -84,7 +84,7 @@ export default function ActivityForm({ activity }: Props) {
 
   const isDisabled = useMemo(() => {
     return isPendingUpdateActivity || isPendingCreateActivity || !isValid
-  }, [isPendingUpdateActivity, isPendingCreateActivity, !isValid])
+  }, [isPendingUpdateActivity, isPendingCreateActivity, isValid])
 
   return (
     <Card className="w-full sm:max-w-xl">
