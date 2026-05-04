@@ -53,6 +53,8 @@ export default function ActivityForm({ activity }: Props) {
   } = form
 
   async function onSubmit(data: ActivityRequest) {
+    console.log(data)
+    
     if (activity) {
       await updateActivityAsync(data, {
         onSuccess: () => {
@@ -134,6 +136,8 @@ export default function ActivityForm({ activity }: Props) {
             control={form.control}
             name="date"
             placeholder="Enter activity date"
+            withTime
+            fromDate={new Date()} 
           />
           <TextInput
             label="Venue"
