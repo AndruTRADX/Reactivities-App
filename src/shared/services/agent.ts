@@ -61,25 +61,19 @@ agent.interceptors.response.use(
         } else {
           toast.error(`${title}: ${message}`)
         }
-        Promise.reject(error)
-        break 
+        return Promise.reject(error)
       case 401:
         toast.error(`${title}: ${message}`)
-        Promise.reject(error)
-        break
+        return Promise.reject(error)
       case 404:
         router.navigate('/not-found', { state: error.response?.data })
-        Promise.reject(error)
-        return
+        return Promise.reject(error)
       case 500:
         router.navigate('/server-error', { state: error.response?.data })
-        Promise.reject(error)
-        return
+        return Promise.reject(error)
       default:
         return Promise.reject(error)
     }
-
-    return Promise.reject(null)
   }
 )
 

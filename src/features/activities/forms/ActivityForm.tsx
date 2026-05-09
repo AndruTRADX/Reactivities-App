@@ -26,6 +26,8 @@ import {
 import type { ActivityResponse } from "@activities/schemas/response/ActivityResponse"
 import { useCreateActivity, useUpdateActivity } from "@activities/hooks/api/useActivities"
 import { useNavigate } from "react-router"
+import LocationInput from "@/shared/components/forms/LocationInput"
+import { SelectInput } from "@/shared/components/forms/SelectInput"
 
 interface Props {
   activity?: ActivityResponse
@@ -36,17 +38,50 @@ export default function ActivityForm({ activity }: Props) {
   const { createActivityAsync, isPendingCreateActivity } = useCreateActivity()
   const navigate = useNavigate()
 
+  const categories = [
+    { label: "Culture", value: "culture" },
+    { label: "Drinks", value: "drinks" },
+    { label: "Film", value: "film" },
+    { label: "Food", value: "food" },
+    { label: "Music", value: "music" },
+    { label: "Travel", value: "travel" },
+  ]
+
+  const defaultValues = useMemo(() => {
+    if (activity) {
+      return {
+        id: activity.id,
+        title: activity.title,
+        description: activity.description,
+        category: activity.category,
+        date: activity.date,
+        location: {
+          venue: activity.venue,
+          city: activity.city,
+          latitude: activity.latitude,
+          longitude: activity.longitude,
+        },
+      }
+    }
+    return {
+      location: {
+        venue: "",
+        city: "",
+        latitude: 0,
+        longitude: 0,
+      },
+    }
+  }, [activity])
+
   const form = useForm({
     resolver: zodResolver(ActivityRequestSchema),
-    defaultValues: activity,
+    defaultValues: defaultValues,
     mode: "onTouched",
   })
 
   useEffect(() => {
-    if (activity) {
-      form.reset(activity)
-    }
-  }, [activity, form])
+    form.reset(defaultValues)
+  }, [activity, form, defaultValues])
 
   const {
     formState: { isValid },
@@ -54,9 +89,12 @@ export default function ActivityForm({ activity }: Props) {
 
   async function onSubmit(data: ActivityRequest) {
     console.log(data)
-    
+    const {location, ...rest} = data;
+    const flattenedData = {...rest, ...location}
+    console.log(flattenedData)
+
     if (activity) {
-      await updateActivityAsync(data, {
+      await updateActivityAsync(flattenedData, {
         onSuccess: () => {
           toast.success("Activity updated successfully")
           form.reset()
@@ -67,11 +105,12 @@ export default function ActivityForm({ activity }: Props) {
         },
       })
     } else {
-      await createActivityAsync(data, {
-        onSuccess: () => {
+      await createActivityAsync(flattenedData, {
+        onSuccess: (id) => {
           toast.success("Activity created successfully")
           form.reset()
-          navigate("/activities")
+          console.log(id);
+          navigate(`/activities/${id}`)
         },
         onError: error => {
           toast.error(`Error creating the activity ${error.message}`)
@@ -125,11 +164,12 @@ export default function ActivityForm({ activity }: Props) {
             rows={3}
             placeholder="Enter a detailed description"
           />
-          <TextInput
+          <SelectInput
             label="Category"
             control={form.control}
             name="category"
-            placeholder="Enter activity category"
+            placeholder="Pick a category"
+            items={categories}
           />
           <DateInput
             label="Date"
@@ -137,19 +177,13 @@ export default function ActivityForm({ activity }: Props) {
             name="date"
             placeholder="Enter activity date"
             withTime
-            fromDate={new Date()} 
+            fromDate={new Date()}
           />
-          <TextInput
-            label="Venue"
+          <LocationInput
+            label="Location"
             control={form.control}
-            name="venue"
-            placeholder="Enter activity venue"
-          />
-          <TextInput
-            label="City"
-            control={form.control}
-            name="city"
-            placeholder="Enter activity city"
+            name="location"
+            placeholder="Search for a venue or place"
           />
         </form>
       </CardContent>
