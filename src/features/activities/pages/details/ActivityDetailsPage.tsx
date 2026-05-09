@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@sharedUi/card"
-import { Link, useParams } from "react-router"
+import { Link, useNavigate, useParams } from "react-router"
 import { useDeleteActivity, useGetActivityById } from "@activities/hooks/api/useActivities"
 import { format } from "date-fns"
 import { SkeletonPage } from "./components/SkeletonPage"
@@ -27,6 +27,7 @@ export default function ActivityDetailsPage() {
   const { activity, isPendingActivity } = useGetActivityById(id)
   const { deleteActivityAsync, isPendingDeleteActivity } = useDeleteActivity()
   const { confirmDelete } = useConfirmDialog()
+  const navigate = useNavigate()
 
   if (isPendingActivity) {
     return <SkeletonPage />
@@ -46,7 +47,10 @@ export default function ActivityDetailsPage() {
       description: `Delete activity "${activity.title}"? This action cannot be undone.`,
       onConfirm: async () => {
         await deleteActivityAsync(activity.id, {
-          onSuccess: () => toast.success("Activity deleted successfully"),
+          onSuccess: () => {
+            toast.success("Activity deleted successfully")
+            navigate('/activities')
+          },
           onError: error => toast.error(`Error deleting the activity: ${error.message}`),
         })
       },

@@ -15,8 +15,6 @@ export const ActivityRequestSchema = z.object({
     latitude: z.coerce.number(),
     longitude: z.coerce.number(),
   }),
-  // latitude: z.coerce.number(),
-  // longitude: z.coerce.number(),
 })
 
 export type ActivityRequest = z.infer<typeof ActivityRequestSchema>

@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { PagedResponse } from "@sharedSchemas/response/PagedResponse"
 import agent from "@/shared/services/agent"
 import type { ActivityResponse } from "@activities/schemas/response/ActivityResponse"
-import type { ActivityRequest } from "@activities/schemas/request/ActivityRequest"
 
 export const useGetActivities = () => {
   const { data, isPending } = useQuery<PagedResponse<ActivityResponse>>({
@@ -21,10 +20,9 @@ export const useGetActivities = () => {
 
 export const useGetActivityById = (id: string | undefined) => {
   const { data, isPending } = useQuery<ActivityResponse>({
-    queryKey: ["activities", id],
+    queryKey: ["activity", id],
     queryFn: async () => {
-      const response = await agent.get<ActivityResponse>(`/activities/${id}`)
-      return response
+      return await agent.get<ActivityResponse>(`/activities/${id}`)
     },
     enabled: !!id
   })
@@ -38,8 +36,8 @@ export const useGetActivityById = (id: string | undefined) => {
 export const useCreateActivity = () => {
   const queryClient = useQueryClient()
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (activity: ActivityRequest) => {
-      await agent.post("/activities", activity)
+    mutationFn: async (activity: unknown) => {
+      return await agent.post("/activities", activity)
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -57,8 +55,8 @@ export const useCreateActivity = () => {
 export const useUpdateActivity = () => {
   const queryClient = useQueryClient()
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (activity: ActivityRequest) => {
-      await agent.put("/activities", activity)
+    mutationFn: async (activity: unknown) => {
+      return await agent.put("/activities", activity)
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -77,7 +75,7 @@ export const useDeleteActivity = () => {
   const queryClient = useQueryClient()
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (id: string) => {
-      await agent.delete(`/activities/${id}`)
+      return await agent.delete(`/activities/${id}`)
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
