@@ -53,7 +53,6 @@ export default function LocationInput<T extends FieldValues>({
       const data = Array.isArray(res) ? res : (res as any).data
       setSuggestions(Array.isArray(data) ? data : [])
     } catch (error) {
-      console.error("Error fetching locations:", error)
       setSuggestions([])
     } finally {
       setLoading(false)
@@ -107,7 +106,7 @@ export default function LocationInput<T extends FieldValues>({
         )}
 
         {(loading || suggestions.length > 0 || (query.length > 0 && query.length < 3)) && (
-          <CommandList>
+          <CommandList className="mt-2">
             {loading && suggestions.length === 0 && (
               <CommandEmpty>
                 <Spinner /> Loading...
@@ -125,7 +124,8 @@ export default function LocationInput<T extends FieldValues>({
                 value={item.place_id}
                 onSelect={() => handleSelect(item.place_id)}
               >
-                <HugeiconsIcon icon={MapPin}></HugeiconsIcon>{item.display_name}
+                <HugeiconsIcon icon={MapPin}  />
+                {item.display_name}
               </CommandItem>
             ))}
           </CommandList>

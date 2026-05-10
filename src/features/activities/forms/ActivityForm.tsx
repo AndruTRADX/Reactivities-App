@@ -88,10 +88,8 @@ export default function ActivityForm({ activity }: Props) {
   } = form
 
   async function onSubmit(data: ActivityRequest) {
-    console.log(data)
     const {location, ...rest} = data;
     const flattenedData = {...rest, ...location}
-    console.log(flattenedData)
 
     if (activity) {
       await updateActivityAsync(flattenedData, {
@@ -109,7 +107,6 @@ export default function ActivityForm({ activity }: Props) {
         onSuccess: (id) => {
           toast.success("Activity created successfully")
           form.reset()
-          console.log(id);
           navigate(`/activities/${id}`)
         },
         onError: error => {
