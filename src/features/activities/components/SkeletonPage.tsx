@@ -5,8 +5,8 @@ export function SkeletonPage() {
   return (
     <div className="grid grid-cols-4 gap-6 pt-2">
       <div className="flex flex-col col-span-3 gap-4">
-        {Array.from({ length: 3 }).map(() => (
-          <Card className="w-full">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <Card className="w-full" key={`activity-item-paged-${index}`}>
             <div className="flex px-7 gap-4 items-center">
               <Skeleton className="size-14 shrink-0 rounded-full" />
               <div className="w-full flex flex-col gap-3">
