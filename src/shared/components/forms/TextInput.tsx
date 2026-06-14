@@ -3,63 +3,54 @@ import { Input } from "@sharedUi/input"
 import { Textarea } from "@sharedUi/textarea"
 import { Field, FieldLabel, FieldDescription, FieldError } from "@sharedUi/field"
 
-type Props<T extends FieldValues> = {
+type BaseProps<T extends FieldValues> = {
   label?: string
   description?: string
-  multiline?: boolean
-  rows?: number
-} & UseControllerProps<T> &
-  Omit<React.InputHTMLAttributes<HTMLInputElement>, "defaultValue" | "name"> &
-  Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "defaultValue" | "name">
+} & UseControllerProps<T>
+
+type TextInputProps<T extends FieldValues> = BaseProps<T> & (
+  | ({ multiline?: false } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "defaultValue" | "name">)
+  | ({ multiline: true; rows?: number } & Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "defaultValue" | "name">)
+)
 
 export default function TextInput<T extends FieldValues>({
   label,
   description,
   multiline = false,
-  rows = 3,
   ...props
-}: Props<T>) {
+}: TextInputProps<T>) {
   const {
     field: { onChange, onBlur, value, ref },
     fieldState: { error },
   } = useController(props)
 
-  const renderInput = () => {
-    const commonProps = {
-      id: props.name,
-      onChange,
-      onBlur,
-      value: value || "",
-      ref,
-      "aria-invalid": !!error,
-      placeholder: props.placeholder,
-      disabled: props.disabled,
-    }
-
-    if (multiline) {
-      return (
-        <Textarea
-          {...commonProps}
-          rows={rows}
-          {...(props as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
-        />
-      )
-    }
-
-    return (
-      <Input
-        {...commonProps}
-        type={props.type || "text"}
-        {...(props as React.InputHTMLAttributes<HTMLInputElement>)}
-      />
-    )
+  const commonProps = {
+    id: props.name,
+    onChange,
+    onBlur,
+    value: value ?? "",
+    ref,
+    "aria-invalid": !!error,
   }
 
   return (
     <Field className="mb-3">
       {label && <FieldLabel htmlFor={props.name}>{label}</FieldLabel>}
       {description && <FieldDescription>{description}</FieldDescription>}
-      {renderInput()}
+
+      {multiline ? (
+        <Textarea
+          {...(props as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+          {...commonProps}
+          rows={"rows" in props ? props.rows : 3}
+        />
+      ) : (
+        <Input
+          {...(props as React.InputHTMLAttributes<HTMLInputElement>)}
+          {...commonProps}
+        />
+      )}
+
       {error && <FieldError>{error.message}</FieldError>}
     </Field>
   )

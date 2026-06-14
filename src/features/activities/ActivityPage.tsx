@@ -7,9 +7,11 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { Filter } from "@hugeicons/core-free-icons"
 import { RadioGroup, RadioGroupItem } from "@sharedUi/radio-group"
 import { Label } from "@sharedUi/label"
+import { NoContent } from "@/shared/components/common/NotFound"
+import { ErrorShow } from "@/shared/components/common/ErrorShow"
 
 export default function ActivityPage() {
-  const { pagedActivities, isPendingActivities } = useGetActivities()
+  const { pagedActivities, isPendingActivities, errorPagedActivities } = useGetActivities()
 
   const activities = useMemo(() => {
     return pagedActivities?.data ?? []
@@ -17,6 +19,14 @@ export default function ActivityPage() {
 
   if (isPendingActivities) {
     return <SkeletonPage />
+  }
+
+  if (errorPagedActivities) {
+    return <ErrorShow error={errorPagedActivities} />
+  }
+
+  if (!activities || activities.length === 0) {
+    return <NoContent title="No activities" description={`Not activities have been created`} />
   }
 
   return (

@@ -6,8 +6,17 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const requiredString = (fieldString: string) =>
-  z.string({ message: `${fieldString} is required` }).min(1, `${fieldString} is required`)
+export const requiredString = (fieldName: string, min = 1) => {
+  const hasCustomMin = min > 1
+
+  return z
+    .string({ message: `${fieldName} is required` })
+    .min(1, `${fieldName} is required`)
+    .refine(
+      (val) => !hasCustomMin || val.length >= min,
+      `${fieldName} must have at least ${min} characters`
+    )
+}
 
 export function debounce<T extends (...args: any[]) => void>(
   fn: T,

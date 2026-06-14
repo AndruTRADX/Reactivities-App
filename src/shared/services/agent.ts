@@ -14,34 +14,38 @@ declare module "axios" {
   }
 }
 
+const STATUS_LABELS: Record<number, string> = {
+  400: "Bad Request",
+  401: "Unauthorized",
+  403: "Forbidden",
+  404: "Not Found",
+  500: "Server Error",
+}
+
 const agent = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true
 })
 
 agent.interceptors.response.use(
   <T>(response: AxiosResponse<ApiResponse<T>>): T => {
     const apiResponse = response.data
 
-    if (!apiResponse.success) {
-      const errorMessage = apiResponse.message || "Error en la petición"
-      const errors = apiResponse.errors || []
-
-      throw {
-        message: errorMessage,
-        errors,
-        response,
-      }
-    }
-
     return apiResponse.data as T
   },
   <T>(error: AxiosError<ProblemDetailsResponse<T>>) => {
-    
+    if (!error.response) {
+      toast.error(`Error de red: ${error.message}`)
+      return Promise.reject(error)
+    }
 
-    const status = error.response?.status
-    const title = error.response?.data?.title
-    const message = error.response?.data?.message
-    const errors = error.response?.data?.errors
+    const status = error.response.status
+    const data = error.response.data
+
+    const hasBody = data && typeof data === "object"
+    const title = (hasBody && data.title) || STATUS_LABELS[status] || "Error"
+    const message = (hasBody && data.message) || error.message
+    const errors = hasBody ? data.errors : undefined
 
     switch (status) {
       case 400:
@@ -51,27 +55,30 @@ agent.interceptors.response.use(
             errorLines.push(`${field}:`)
             messages.forEach(msg => errorLines.push(`  • ${msg}`))
           }
-          const formattedError = errorLines.join("\n")
-
           toast.error(`${title}: ${message}`, {
             style: { whiteSpace: "pre-line" },
-            description: formattedError,
-            icon: null
+            description: errorLines.join("\n"),
+            icon: null,
           })
         } else {
           toast.error(`${title}: ${message}`)
         }
         return Promise.reject(error)
+
       case 401:
         toast.error(`${title}: ${message}`)
         return Promise.reject(error)
+
       case 404:
-        router.navigate('/not-found', { state: error.response?.data })
+        router.navigate("/not-found", { state: error.response.data })
         return Promise.reject(error)
+
       case 500:
-        router.navigate('/server-error', { state: error.response?.data })
+        router.navigate("/server-error", { state: error.response.data })
         return Promise.reject(error)
+
       default:
+        toast.error(`${title}: ${message}`)
         return Promise.reject(error)
     }
   }

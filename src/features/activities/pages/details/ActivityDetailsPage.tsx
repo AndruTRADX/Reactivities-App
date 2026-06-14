@@ -21,12 +21,13 @@ import { Calendar, Info, Location } from "@hugeicons/core-free-icons"
 import { Separator } from "@sharedUi/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@sharedUi/avatar"
 import { Textarea } from "@/shared/components/ui/textarea"
-import { useState } from "react";
-import MapDisplay from "@/shared/components/common/MapDisplay";
+import { useState } from "react"
+import MapDisplay from "@/shared/components/common/MapDisplay"
+import { ErrorShow } from "@/shared/components/common/ErrorShow"
 
 export default function ActivityDetailsPage() {
   const { id } = useParams()
-  const { activity, isPendingActivity } = useGetActivityById(id)
+  const { activity, isPendingActivity, errorActivity } = useGetActivityById(id)
   const { deleteActivityAsync, isPendingDeleteActivity } = useDeleteActivity()
   const { confirmDelete } = useConfirmDialog()
   const navigate = useNavigate()
@@ -34,6 +35,10 @@ export default function ActivityDetailsPage() {
 
   if (isPendingActivity) {
     return <SkeletonPage />
+  }
+
+  if (errorActivity) {
+    return <ErrorShow error={errorActivity} />
   }
 
   if (!activity) {
@@ -119,7 +124,7 @@ export default function ActivityDetailsPage() {
             <HugeiconsIcon icon={Location} className="text-primary w-6" />
             <p className="w-full">{`${activity.city} - ${activity.venue}`}</p>
             <Button onClick={() => setMapOpen(prev => !prev)}>
-              {mapOpen ? 'Hide map' : 'Show map'}
+              {mapOpen ? "Hide map" : "Show map"}
             </Button>
           </CardDescription>
         </CardContent>
