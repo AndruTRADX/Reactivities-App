@@ -1,12 +1,28 @@
-import { UserCircleIcon, UserSearch } from "@hugeicons/core-free-icons"
+import { LaptopIcon, LogoutCircle01Icon, ServerStack03Icon, UserCircleIcon, UserSearch } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Button } from "@sharedUi/button"
-import { NavLink } from "react-router"
+import { NavLink, useNavigate } from "react-router"
 import { cn } from "../lib/utils"
-import { useGetCurrentUser } from "../hooks/api/useAccount"
+import { useGetCurrentUser, useLogoutAccount } from "../hooks/api/useAccount"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu"
+import { useCallback } from "react"
 
 export default function Navbar() {
   const { user } = useGetCurrentUser()
+  const { logoutAccountAsync } = useLogoutAccount()
+  const navigate = useNavigate()
+
+  const handleLogout = useCallback(async () => {
+    await logoutAccountAsync()
+  }, [logoutAccountAsync])
 
   return (
     <nav className="z-50 fixed w-full flex justify-between px-5.5 py-2.5 bg-primary-foreground/50 backdrop-blur-xs">
@@ -50,14 +66,52 @@ export default function Navbar() {
       </div>
 
       {user ? (
-        <div className="flex gap-4 items-center">
-          <Button variant="outline">
-            <HugeiconsIcon icon={UserCircleIcon} className="text-primary min-w-5" />
-            {user.displayName}'s Profile
-          </Button>
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              <HugeiconsIcon icon={UserCircleIcon} className="text-primary min-w-5" />
+              {user.displayName}'s Profile
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-40" align="end">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>My Account</DropdownMenuLabel>
+              <DropdownMenuItem>
+                <HugeiconsIcon icon={UserCircleIcon} className="min-w-5" />
+                Profile
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>GitHub</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() =>
+                  window.open("https://github.com/AndruTRADX/Reactivities-App", "_blank")
+                }
+              >
+                <HugeiconsIcon icon={LaptopIcon} className="min-w-5" />
+                Client
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() =>
+                  window.open("https://github.com/AndruTRADX/Reactivities-Api", "_blank")
+                }
+              >
+                <HugeiconsIcon icon={ServerStack03Icon} className="min-w-5" />
+                API
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem onClick={handleLogout}>
+                <HugeiconsIcon icon={LogoutCircle01Icon} className="text-destructive min-w-5" />
+                Log out
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ) : (
-        <Button>Sign In</Button>
+        <Button onClick={() => navigate("/login")}>Sign In</Button>
       )}
     </nav>
   )

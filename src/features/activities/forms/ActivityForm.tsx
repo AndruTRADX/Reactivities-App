@@ -88,8 +88,8 @@ export default function ActivityForm({ activity }: Props) {
   } = form
 
   async function onSubmit(data: ActivityRequest) {
-    const {location, ...rest} = data;
-    const flattenedData = {...rest, ...location}
+    const { location, ...rest } = data
+    const flattenedData = { ...rest, ...location }
 
     if (activity) {
       await updateActivityAsync(flattenedData, {
@@ -98,19 +98,13 @@ export default function ActivityForm({ activity }: Props) {
           form.reset()
           navigate(`/activities/${activity.id}`)
         },
-        onError: error => {
-          toast.error(`Error updating the activity ${error.message}`)
-        },
       })
     } else {
       await createActivityAsync(flattenedData, {
-        onSuccess: (id) => {
+        onSuccess: id => {
           toast.success("Activity created successfully")
           form.reset()
           navigate(`/activities/${id}`)
-        },
-        onError: error => {
-          toast.error(`Error creating the activity ${error.message}`)
         },
       })
     }

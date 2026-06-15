@@ -27,7 +27,7 @@ import { ErrorShow } from "@/shared/components/common/ErrorShow"
 
 export default function ActivityDetailsPage() {
   const { id } = useParams()
-  const { activity, isPendingActivity, errorActivity } = useGetActivityById(id)
+  const { activity, isLoadingActivity: isPendingActivity, errorActivity } = useGetActivityById(id)
   const { deleteActivityAsync, isPendingDeleteActivity } = useDeleteActivity()
   const { confirmDelete } = useConfirmDialog()
   const navigate = useNavigate()

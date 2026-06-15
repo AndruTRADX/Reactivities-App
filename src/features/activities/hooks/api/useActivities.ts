@@ -4,7 +4,7 @@ import agent from "@/shared/services/agent"
 import type { ActivityResponse } from "@activities/schemas/response/ActivityResponse"
 
 export const useGetActivities = () => {
-  const { data, isPending, error } = useQuery<PagedResponse<ActivityResponse>>({
+  const { data, isLoading, error } = useQuery<PagedResponse<ActivityResponse>>({
     queryKey: ["activities"],
     queryFn: async () => {
       const response = await agent.get<PagedResponse<ActivityResponse>>("/activities")
@@ -14,13 +14,13 @@ export const useGetActivities = () => {
 
   return {
     pagedActivities: data,
-    isPendingActivities: isPending,
+    isLoadingActivities: isLoading,
     errorPagedActivities: error
   }
 }
 
 export const useGetActivityById = (id: string | undefined) => {
-  const { data, isPending, error } = useQuery<ActivityResponse>({
+  const { data, isLoading, error } = useQuery<ActivityResponse>({
     queryKey: ["activity", id],
     queryFn: async () => {
       return await agent.get<ActivityResponse>(`/activities/${id}`)
@@ -30,7 +30,7 @@ export const useGetActivityById = (id: string | undefined) => {
 
   return {
     activity: data,
-    isPendingActivity: isPending,
+    isLoadingActivity: isLoading,
     errorActivity: error
   }
 }

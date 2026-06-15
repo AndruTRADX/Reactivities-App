@@ -5,7 +5,7 @@ import { SkeletonForm } from "./components/SkeletonForm"
 
 export default function UpdateActivityPage() {
   const { id } = useParams()
-  const { activity, isPendingActivity } = useGetActivityById(id ?? '')
+  const { activity, isLoadingActivity: isPendingActivity } = useGetActivityById(id ?? '')
 
   if (isPendingActivity) {
     return <SkeletonForm />
