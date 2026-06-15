@@ -7,7 +7,8 @@ import ActivityDetailsPage from "@/features/activities/pages/details/ActivityDet
 import UpdateActivityPage from "@/features/activities/pages/update/UpdateActivityPage"
 import ServerErrorPage from "@/features/errors/ServerErrorPage"
 import NotFoundPage from "@/features/errors/NotFoundPage"
-import LoginPage from "@/features/account/LoginPage";
+import LoginPage from "@/features/account/LoginPage"
+import RequireAuth from "./RequireAuth"
 
 export const router = createBrowserRouter([
   {
@@ -19,20 +20,25 @@ export const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: "activities",
-        element: <ActivityPage />,
-      },
-      {
-        path: "activities/:id",
-        element: <ActivityDetailsPage />,
-      },
-      {
-        path: "create-activity",
-        element: <CreateActivityPage />,
-      },
-      {
-        path: "update-activity/:id",
-        element: <UpdateActivityPage />,
+        element: <RequireAuth />,
+        children: [
+          {
+            path: "activities",
+            element: <ActivityPage />,
+          },
+          {
+            path: "activities/:id",
+            element: <ActivityDetailsPage />,
+          },
+          {
+            path: "create-activity",
+            element: <CreateActivityPage />,
+          },
+          {
+            path: "update-activity/:id",
+            element: <UpdateActivityPage />,
+          },
+        ],
       },
       {
         path: "login",

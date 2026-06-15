@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form"
-import { useLoginAccount } from "../hooks/api/useAccount"
+import { useRegisterAccount } from "../hooks/api/useAccount"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { LoginRequestSchema, type LoginRequest } from "../schemas/request/LoginRequest"
+import { RegisterUserRequestSchema, type RegisterUserRequest } from "../schemas/request/RegisterUserRequest"
 import { useMemo } from "react"
 import { toast } from "sonner"
 import {
@@ -13,19 +13,18 @@ import {
   CardTitle,
 } from "@sharedUi/card"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { Login01Icon } from "@hugeicons/core-free-icons"
+import { UserAdd01Icon } from "@hugeicons/core-free-icons"
 import TextInput from "@/shared/components/forms/TextInput"
 import { Button } from "@/shared/components/ui/button"
 import { Spinner } from "@/shared/components/ui/spinner"
-import { useLocation, useNavigate } from "react-router"
+import { useNavigate } from "react-router"
 
-export default function LoginForm() {
-  const { isPendingLoginAccount, loginAccountAsync } = useLoginAccount()
+export default function RegisterForm() {
+  const { isPendingRegisterAccount, registerAccountAsync } = useRegisterAccount()
   const navigate = useNavigate()
-  const location = useLocation()
 
-  const form = useForm({
-    resolver: zodResolver(LoginRequestSchema),
+  const form = useForm<RegisterUserRequest>({
+    resolver: zodResolver(RegisterUserRequestSchema),
     mode: "onTouched",
   })
 
@@ -33,36 +32,36 @@ export default function LoginForm() {
     formState: { isValid },
   } = form
 
-  async function onSubmit(data: LoginRequest) {
-    await loginAccountAsync(data, {
+  async function onSubmit(data: RegisterUserRequest) {
+    await registerAccountAsync(data, {
       onSuccess: () => {
-        toast.success("Welcome back!")
+        toast.success("Account created successfully!")
         form.reset()
-        navigate(location.state?.from || '/activities')
+        navigate("/login")
       },
     })
   }
 
   const isSubmitting = useMemo(() => {
-    return isPendingLoginAccount
-  }, [isPendingLoginAccount])
+    return isPendingRegisterAccount
+  }, [isPendingRegisterAccount])
 
   const isDisabled = useMemo(() => {
-    return isPendingLoginAccount || !isValid
-  }, [isPendingLoginAccount, isValid])
+    return isPendingRegisterAccount || !isValid
+  }, [isPendingRegisterAccount, isValid])
 
   return (
     <Card className="w-full sm:max-w-xl">
       <CardHeader>
         <CardTitle className="flex gap-2">
-          <HugeiconsIcon icon={Login01Icon} className="text-primary" /> Sign in
+          <HugeiconsIcon icon={UserAdd01Icon} className="text-primary" /> Create account
         </CardTitle>
         <CardDescription>
           Join your friends and discover activities happening around you
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
+        <form id="form-register" onSubmit={form.handleSubmit(onSubmit)}>
           <TextInput
             label="Email"
             type="email"
@@ -71,11 +70,29 @@ export default function LoginForm() {
             placeholder="ryangosling@acme.com"
           />
           <TextInput
+            label="Display name"
+            control={form.control}
+            name="displayName"
+            placeholder="Ryan Gosling"
+          />
+          <TextInput
             label="Password"
             control={form.control}
             type="password"
             name="password"
-            placeholder="Enter your password"
+            placeholder="At least 6 characters"
+          />
+          <TextInput
+            label="Biography"
+            control={form.control}
+            name="biography"
+            placeholder="Tell us a bit about yourself (optional)"
+          />
+          <TextInput
+            label="Profile image URL"
+            control={form.control}
+            name="imageUrl"
+            placeholder="https://example.com/avatar.png (optional)"
           />
         </form>
       </CardContent>
@@ -83,13 +100,13 @@ export default function LoginForm() {
         <Button type="button" variant="outline" onClick={() => form.reset()}>
           Reset
         </Button>
-        <Button type="submit" form="form-rhf-demo" disabled={isDisabled}>
+        <Button type="submit" form="form-register" disabled={isDisabled}>
           {isSubmitting ? (
             <>
-              <Spinner /> Signing in
+              <Spinner /> Creating account
             </>
           ) : (
-            "Log in"
+            "Register"
           )}
         </Button>
       </CardFooter>
