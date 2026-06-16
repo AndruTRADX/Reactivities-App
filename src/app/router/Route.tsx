@@ -9,6 +9,7 @@ import ServerErrorPage from "@/features/errors/ServerErrorPage"
 import NotFoundPage from "@/features/errors/NotFoundPage"
 import LoginPage from "@/features/account/LoginPage"
 import RequireAuth from "./RequireAuth"
+import RegisterPage from "@/features/account/RegisterPage"
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +19,14 @@ export const router = createBrowserRouter([
       {
         path: "",
         element: <HomePage />,
+      },
+      {
+        path: "login",
+        element: <LoginPage />,
+      },
+      {
+        path: "register",
+        element: <RegisterPage />,
       },
       {
         element: <RequireAuth />,
@@ -39,10 +48,6 @@ export const router = createBrowserRouter([
             element: <UpdateActivityPage />,
           },
         ],
-      },
-      {
-        path: "login",
-        element: <LoginPage />,
       },
       {
         path: "not-found",

@@ -3,7 +3,6 @@ import { useRegisterAccount } from "../hooks/api/useAccount"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { RegisterUserRequestSchema, type RegisterUserRequest } from "../schemas/request/RegisterUserRequest"
 import { useMemo } from "react"
-import { toast } from "sonner"
 import {
   Card,
   CardContent,
@@ -17,11 +16,10 @@ import { UserAdd01Icon } from "@hugeicons/core-free-icons"
 import TextInput from "@/shared/components/forms/TextInput"
 import { Button } from "@/shared/components/ui/button"
 import { Spinner } from "@/shared/components/ui/spinner"
-import { useNavigate } from "react-router"
+import { Link } from "react-router"
 
 export default function RegisterForm() {
   const { isPendingRegisterAccount, registerAccountAsync } = useRegisterAccount()
-  const navigate = useNavigate()
 
   const form = useForm<RegisterUserRequest>({
     resolver: zodResolver(RegisterUserRequestSchema),
@@ -35,9 +33,7 @@ export default function RegisterForm() {
   async function onSubmit(data: RegisterUserRequest) {
     await registerAccountAsync(data, {
       onSuccess: () => {
-        toast.success("Account created successfully!")
         form.reset()
-        navigate("/login")
       },
     })
   }
@@ -88,13 +84,15 @@ export default function RegisterForm() {
             name="biography"
             placeholder="Tell us a bit about yourself (optional)"
           />
-          <TextInput
-            label="Profile image URL"
-            control={form.control}
-            name="imageUrl"
-            placeholder="https://example.com/avatar.png (optional)"
-          />
         </form>
+        <div className="mt-6">
+          <p className="text-muted-foreground">
+            Already have an account?{" "}
+            <Link to="/login" className="text-primary underline">
+              Sign In.
+            </Link>
+          </p>
+        </div>
       </CardContent>
       <CardFooter className="flex gap-2 justify-end">
         <Button type="button" variant="outline" onClick={() => form.reset()}>

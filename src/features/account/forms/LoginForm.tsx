@@ -17,7 +17,7 @@ import { Login01Icon } from "@hugeicons/core-free-icons"
 import TextInput from "@/shared/components/forms/TextInput"
 import { Button } from "@/shared/components/ui/button"
 import { Spinner } from "@/shared/components/ui/spinner"
-import { useLocation, useNavigate } from "react-router"
+import { Link, useLocation, useNavigate } from "react-router"
 
 export default function LoginForm() {
   const { isPendingLoginAccount, loginAccountAsync } = useLoginAccount()
@@ -38,7 +38,7 @@ export default function LoginForm() {
       onSuccess: () => {
         toast.success("Welcome back!")
         form.reset()
-        navigate(location.state?.from || '/activities')
+        navigate(location.state?.from || "/activities")
       },
     })
   }
@@ -78,6 +78,14 @@ export default function LoginForm() {
             placeholder="Enter your password"
           />
         </form>
+        <div className="mt-6">
+          <p className="text-muted-foreground">
+            Don't have an account?{" "}
+            <Link to="/register" className="text-primary underline">
+              Register.
+            </Link>
+          </p>
+        </div>
       </CardContent>
       <CardFooter className="flex gap-2 justify-end">
         <Button type="button" variant="outline" onClick={() => form.reset()}>
@@ -89,7 +97,7 @@ export default function LoginForm() {
               <Spinner /> Signing in
             </>
           ) : (
-            "Log in"
+            "Sign in"
           )}
         </Button>
       </CardFooter>
