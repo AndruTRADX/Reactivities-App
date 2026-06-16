@@ -111,7 +111,10 @@ export default function Navbar() {
           </DropdownMenuContent>
         </DropdownMenu>
       ) : (
-        <Button onClick={() => navigate("/login")}>Sign In</Button>
+        <div className="flex gap-2 items-center">
+          <Button onClick={() => navigate("/login")}>Sign In</Button>
+          <Button onClick={() => navigate("/register")} variant='outline'>Register</Button>
+        </div>
       )}
     </nav>
   )
