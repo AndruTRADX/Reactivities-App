@@ -4,7 +4,7 @@ import type { ConfirmOptions } from "@/shared/stores/confirmDialogStore";
 export const useConfirmDialog = () => {
   const confirm = useConfirmDialogStore((state) => state.confirm);
 
-  const confirmDelete = (options: Omit<ConfirmOptions, 'confirmVariant' | 'confirmText'>) => {
+  const confirmDelete = (options: Omit<ConfirmOptions, 'confirmVariant' >) => {
     return confirm({
       confirmVariant: 'destructive',
       confirmText: 'Delete',
@@ -14,7 +14,7 @@ export const useConfirmDialog = () => {
     });
   };
 
-  const confirmUpdate = (options: Omit<ConfirmOptions, 'confirmVariant' | 'confirmText'>) => {
+  const confirmUpdate = (options: Omit<ConfirmOptions, 'confirmVariant'>) => {
     return confirm({
       confirmVariant: 'default',
       confirmText: 'Update',
@@ -24,7 +24,7 @@ export const useConfirmDialog = () => {
     });
   };
 
-  const confirmCreate = (options: Omit<ConfirmOptions, 'confirmVariant' | 'confirmText'>) => {
+  const confirmCreate = (options: Omit<ConfirmOptions, 'confirmVariant'>) => {
     return confirm({
       confirmVariant: 'default',
       confirmText: 'Create',

@@ -6,6 +6,7 @@ import { format } from "date-fns"
 import { Avatar, AvatarFallback, AvatarImage } from "@sharedUi/avatar"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Clock, Location } from "@hugeicons/core-free-icons"
+import { Badge } from "@/shared/components/ui/badge"
 
 interface Props {
   activity: ActivityResponse
@@ -23,7 +24,22 @@ export default function ActivityCard({ activity }: Props) {
         </Avatar>
 
         <div>
-          <CardTitle>{activity.title}</CardTitle>
+          <CardTitle className="font-semibold flex items-center gap-2">
+            {activity.title}
+            {activity.currentStatus === "Cancelled" && (
+              <Badge variant="destructive" className="text-destructive border border-destructive">
+                Cancelled
+              </Badge>
+            )}
+            {activity.currentStatus === "Completed" && (
+              <Badge
+                variant="default"
+                className="text-positive bg-positive/25 border border-positive"
+              >
+                Completed
+              </Badge>
+            )}
+          </CardTitle>
           <CardDescription>
             Hosted by{" "}
             <Button variant="link" className="px-0">

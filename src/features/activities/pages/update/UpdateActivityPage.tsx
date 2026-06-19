@@ -2,6 +2,7 @@ import ActivityForm from "@activities/forms/ActivityForm"
 import { useParams } from "react-router"
 import { useGetActivityById } from "@activities/hooks/api/useActivities"
 import { SkeletonForm } from "./components/SkeletonForm"
+import FormWrapper from "@/shared/components/common/FormWrapper";
 
 export default function UpdateActivityPage() {
   const { id } = useParams()
@@ -12,8 +13,8 @@ export default function UpdateActivityPage() {
   }
 
   return (
-    <div className="flex justify-center">
+    <FormWrapper>
       <ActivityForm activity={activity} />
-    </div>
+    </FormWrapper>
   )
 }
