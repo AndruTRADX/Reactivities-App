@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { PagedResponse } from "@sharedSchemas/response/PagedResponse"
 import agent from "@/shared/services/agent"
 import type { ActivityResponse } from "@activities/schemas/response/ActivityResponse"
+import type { CancelActivityRequest } from "../../schemas/request/CancelActivityRequest";
 
 export const useGetActivities = () => {
   const { data, isLoading, error } = useQuery<PagedResponse<ActivityResponse>>({
@@ -73,11 +74,11 @@ export const useUpdateActivity = () => {
   }
 }
 
-export const useDeleteActivity = () => {
+export const useCancelActivity = () => {
   const queryClient = useQueryClient()
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (id: string) => {
-      return await agent.delete(`/activities/${id}`)
+    mutationFn: async (cancelActivity: CancelActivityRequest) => {
+      return await agent.post(`/activities/cancel-activity`, cancelActivity)
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
@@ -87,7 +88,7 @@ export const useDeleteActivity = () => {
   })
 
   return {
-    deleteActivityAsync: mutateAsync,
-    isPendingDeleteActivity: isPending,
+    cancelActivityAsync: mutateAsync,
+    isPendingCancelActivity: isPending,
   }
 }

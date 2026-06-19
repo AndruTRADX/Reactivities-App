@@ -19,6 +19,7 @@ const STATUS_LABELS: Record<number, string> = {
   401: "Unauthorized",
   403: "Forbidden",
   404: "Not Found",
+  422: "Unprocessable Content",
   500: "Server Error",
 }
 
@@ -35,7 +36,7 @@ agent.interceptors.response.use(
   },
   <T>(error: AxiosError<ProblemDetailsResponse<T>>) => {
     if (!error.response) {
-      toast.error(`Error de red: ${error.message}`)
+      toast.error(`Something went wrong: ${error.message}`)
       return Promise.reject(error)
     }
 
@@ -63,10 +64,6 @@ agent.interceptors.response.use(
         } else {
           toast.error(`${title}: ${message}`)
         }
-        return Promise.reject(error)
-
-      case 401:
-        toast.error(`${title}: ${message}`)
         return Promise.reject(error)
 
       case 404:
