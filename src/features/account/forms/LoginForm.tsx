@@ -62,7 +62,7 @@ export default function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
+        <form id="login-form" onSubmit={form.handleSubmit(onSubmit)}>
           <TextInput
             label="Email"
             type="email"
@@ -91,7 +91,7 @@ export default function LoginForm() {
         <Button type="button" variant="outline" onClick={() => form.reset()}>
           Reset
         </Button>
-        <Button type="submit" form="form-rhf-demo" disabled={isDisabled}>
+        <Button type="submit" form="login-form" disabled={isDisabled}>
           {isSubmitting ? (
             <>
               <Spinner /> Signing in

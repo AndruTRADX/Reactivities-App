@@ -140,7 +140,7 @@ export default function ActivityForm({ activity }: Props) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
+        <form id="activity-form" onSubmit={form.handleSubmit(onSubmit)}>
           <TextInput
             label="Title"
             control={form.control}
@@ -182,7 +182,7 @@ export default function ActivityForm({ activity }: Props) {
         <Button type="button" variant="outline" onClick={() => form.reset()}>
           Reset
         </Button>
-        <Button type="submit" form="form-rhf-demo" disabled={isDisabled}>
+        <Button type="submit" form="activity-form" disabled={isDisabled}>
           {isSubmitting ? (
             <>
               <Spinner /> Submitting
