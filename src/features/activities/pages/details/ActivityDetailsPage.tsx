@@ -14,14 +14,15 @@ import { useCancelActivity, useGetActivityById } from "@activities/hooks/api/use
 import { format } from "date-fns"
 import { SkeletonPage } from "./components/SkeletonPage"
 import { NoContent } from "@/shared/components/common/NotFound"
-import { useConfirmDialog } from "@/shared/hooks/useConfirmDialog"
+import { CancelActivityDialog } from "./components/CancelActivityDialog"
 import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Calendar, Info, Location } from "@hugeicons/core-free-icons"
 import { Separator } from "@sharedUi/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@sharedUi/avatar"
 import { Textarea } from "@/shared/components/ui/textarea"
-import { useState } from "react"
+import { useState, useCallback } from "react"
+import type { CancelActivityRequest } from "@activities/schemas/request/CancelActivityRequest"
 import MapDisplay from "@/shared/components/common/MapDisplay"
 import { ErrorShow } from "@/shared/components/common/ErrorShow"
 
@@ -29,9 +30,22 @@ export default function ActivityDetailsPage() {
   const { id } = useParams()
   const { activity, isLoadingActivity: isPendingActivity, errorActivity } = useGetActivityById(id)
   const { cancelActivityAsync, isPendingCancelActivity } = useCancelActivity()
-  const { confirmDelete } = useConfirmDialog()
   const navigate = useNavigate()
   const [mapOpen, setMapOpen] = useState(false)
+  const [cancelOpen, setCancelOpen] = useState(false)
+
+  const handleCancel = useCallback(async ({ reason }: CancelActivityRequest) => {
+    if (!activity) return
+    await cancelActivityAsync(
+      { id: activity.id, reason },
+      {
+        onSuccess: () => {
+          toast.success("Activity cancelled successfully")
+          navigate("/activities")
+        },
+      }
+    )
+  }, [activity, cancelActivityAsync, navigate])
 
   if (isPendingActivity) {
     return <SkeletonPage />
@@ -52,26 +66,8 @@ export default function ActivityDetailsPage() {
 
   const attendees = activity.attendees ?? []
 
-  const handleDelete = async () => {
-    confirmDelete({
-      title: "Cancel Activity",
-      description: `Cancel activity "${activity.title}"? This action cannot be undone.`,
-      confirmText: "Cancel Activity",
-      onConfirm: async () => {
-        await cancelActivityAsync(
-          { id: activity.id },
-          {
-            onSuccess: () => {
-              toast.success("Activity cancelled successfully")
-              navigate("/activities")
-            },
-          }
-        )
-      },
-    })
-  }
-
   return (
+    <>
     <div className="grid grid-cols-4 gap-4">
       <Card className="col-span-3 overflow-hidden pt-0">
         <div className="relative aspect-video w-full dark">
@@ -122,7 +118,7 @@ export default function ActivityDetailsPage() {
               <CardFooter className="p-0 gap-2 justify-end">
                 <Button
                   variant="destructive"
-                  onClick={handleDelete}
+                  onClick={() => setCancelOpen(true)}
                   disabled={isPendingCancelActivity}
                 >
                   Cancel Activity
@@ -211,5 +207,13 @@ export default function ActivityDetailsPage() {
         </CardContent>
       </Card>
     </div>
+
+    <CancelActivityDialog
+      open={cancelOpen}
+      onOpenChange={setCancelOpen}
+      onConfirm={handleCancel}
+      isPending={isPendingCancelActivity}
+    />
+    </>
   )
 }

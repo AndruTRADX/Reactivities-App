@@ -77,8 +77,8 @@ export const useUpdateActivity = () => {
 export const useCancelActivity = () => {
   const queryClient = useQueryClient()
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (cancelActivity: CancelActivityRequest) => {
-      return await agent.post(`/activities/cancel-activity`, cancelActivity)
+    mutationFn: async ({ id, ...request }: { id: string } & CancelActivityRequest) => {
+      return await agent.patch(`/activities/${id}/cancel`, request)
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
