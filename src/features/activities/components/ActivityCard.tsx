@@ -23,8 +23,8 @@ export default function ActivityCard({ activity }: Props) {
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
 
-        <div>
-          <CardTitle className="font-semibold flex items-center gap-2">
+        <div className="w-full">
+          <CardTitle className="font-semibold flex items-center justify-between gap-2">
             {activity.title}
             {activity.currentStatus === "Cancelled" && (
               <Badge variant="destructive" className="text-destructive border border-destructive">

@@ -1,73 +1,59 @@
-# React + TypeScript + Vite
+# ReactivitiesApp
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend for the Reactivities project. Built with React 19, TypeScript, Vite, TanStack Query, React Hook Form, Zod, and Shadcn/ui.
 
-Currently, two official plugins are available:
+## Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- [Node.js](https://nodejs.org/) 20+
+- [pnpm](https://pnpm.io/) — install with `npm install -g pnpm`
+- The backend (`ReactivitiesApi`) running locally — the app will not function without it
 
-## React Compiler
+## Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### **1. Install dependencies**
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### **2. Configure environment variables**
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Copy the example file and fill in the values:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cp .env.example .env.development
 ```
+
+| Variable | Description |
+|---|---|
+| `VITE_API_URL` | Backend base URL (e.g. `https://localhost:5001/api`) |
+| `VITE_LOCATION_IQ_API_URL` | LocationIQ autocomplete endpoint |
+| `VITE_LOCATION_IQ_ACCESS_TOKEN` | LocationIQ API key |
+
+### **3. Start the dev server**
+
+```bash
+pnpm dev
+```
+
+The app runs at `http://localhost:5173` by default.
+
+## Other scripts
+
+| Command | Description |
+|---|---|
+| `pnpm build` | Type-check + production build |
+| `pnpm preview` | Serve the production build locally |
+| `pnpm lint` | Run ESLint |
+
+## Project conventions
+
+Before writing any form, hook, or schema, read the relevant doc:
+
+| Topic | Doc |
+|---|---|
+| Path aliases | [docs/path-aliases.md](./docs/path-aliases.md) |
+| Zod schemas (request & response) | [docs/schemas.md](./docs/schemas.md) |
+| Forms (React Hook Form, components, skeleton) | [docs/forms.md](./docs/forms.md) |
+| API hooks (useQuery, useMutation, agent.ts) | [docs/api-hooks.md](./docs/api-hooks.md) |
+| Backend context (CQRS, ApiResponse, validation) | [docs/backend-context.md](./docs/backend-context.md) |
