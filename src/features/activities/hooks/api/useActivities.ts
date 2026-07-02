@@ -58,13 +58,14 @@ export const useCreateActivity = () => {
 export const useUpdateActivity = () => {
   const queryClient = useQueryClient()
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (activity: unknown) => {
+    mutationFn: async (activity: { id?: string }) => {
       return await agent.put("/activities", activity)
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({
-        queryKey: ["activities"],
-      })
+    onSuccess: async (_data, activity) => {
+      await queryClient.invalidateQueries({ queryKey: ["activities"] })
+      if (activity.id) {
+        await queryClient.invalidateQueries({ queryKey: ["activity", activity.id] })
+      }
     },
   })
 

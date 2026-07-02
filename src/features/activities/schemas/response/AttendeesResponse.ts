@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { UserResponseSchema } from "./UserResponse"
+import { UserResponseSchema } from "@sharedSchemas/response/UserResponse"
 
 export const AttendeesResponseSchema = z.object({
   id: z.string(),

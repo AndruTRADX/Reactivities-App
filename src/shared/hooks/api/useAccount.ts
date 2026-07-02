@@ -1,4 +1,4 @@
-import type { UserResponse } from "@/features/account/schemas/response/UserResponse"
+import type { UserResponse } from "@sharedSchemas/response/UserResponse"
 import agent from "@/shared/services/agent"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router";
