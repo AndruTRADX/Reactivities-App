@@ -1,5 +1,5 @@
-import FormWrapper from "@/shared/components/common/FormWrapper";
-import ActivityForm from "../../forms/ActivityForm"
+import FormWrapper from "@/shared/components/common/FormWrapper"
+import ActivityForm from "@activities/forms/ActivityForm"
 
 export default function CreateActivityPage() {
   return (

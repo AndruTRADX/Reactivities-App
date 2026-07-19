@@ -13,18 +13,18 @@ export const requiredString = (fieldName: string, min = 1) => {
     .string({ message: `${fieldName} is required` })
     .min(1, `${fieldName} is required`)
     .refine(
-      (val) => !hasCustomMin || val.length >= min,
+      val => !hasCustomMin || val.length >= min,
       `${fieldName} must have at least ${min} characters`
     )
 }
 
-export function debounce<T extends (...args: any[]) => void>(
-  fn: T,
+export function debounce<Args extends unknown[]>(
+  fn: (...args: Args) => void,
   delay = 300
-): (...args: Parameters<T>) => void {
+): (...args: Args) => void {
   let timer: ReturnType<typeof setTimeout>
 
-  return (...args: Parameters<T>) => {
+  return (...args: Args) => {
     clearTimeout(timer)
     timer = setTimeout(() => {
       fn(...args)

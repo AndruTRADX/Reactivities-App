@@ -2,7 +2,7 @@ import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@s
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Lock } from "@hugeicons/core-free-icons"
 import { isAxiosError } from "axios"
-import { Badge } from "@sharedUi/badge";
+import { Badge } from "@sharedUi/badge"
 
 interface Props {
   error: Error | null
@@ -11,11 +11,11 @@ interface Props {
 export function ErrorShow({ error }: Props) {
   const isAxios = isAxiosError(error)
 
-  const title   = isAxios ? error.response?.data?.title   : null
+  const title = isAxios ? error.response?.data?.title : null
   const description = isAxios ? error.response?.data?.message : null
-  const status  = isAxios ? error.response?.status        : null
-  const method  = isAxios ? error.config?.method?.toUpperCase() : null
-  const url     = isAxios ? error.config?.url             : null
+  const status = isAxios ? error.response?.status : null
+  const method = isAxios ? error.config?.method?.toUpperCase() : null
+  const url = isAxios ? error.config?.url : null
 
   return (
     <Empty>
@@ -25,7 +25,9 @@ export function ErrorShow({ error }: Props) {
         </EmptyMedia>
 
         {status && (
-          <Badge variant="destructive">{status} {title}</Badge>
+          <Badge variant="destructive">
+            {status} {title}
+          </Badge>
         )}
 
         <EmptyTitle>{title ?? "An error has occurred"}</EmptyTitle>

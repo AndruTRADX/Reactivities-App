@@ -1,5 +1,5 @@
 import { Spinner } from "@sharedUi/spinner"
-import { useGetCurrentUser } from "@/shared/hooks/api/useAccount"
+import { useGetCurrentUser } from "@sharedHooks/api/useAccount"
 import { Navigate, Outlet, useLocation } from "react-router"
 
 export default function RequireAuth() {

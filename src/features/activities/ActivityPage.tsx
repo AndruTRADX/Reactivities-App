@@ -11,7 +11,11 @@ import { NoContent } from "@/shared/components/common/NotFound"
 import { ErrorShow } from "@/shared/components/common/ErrorShow"
 
 export default function ActivityPage() {
-  const { pagedActivities, isLoadingActivities: isPendingActivities, errorPagedActivities } = useGetActivities()
+  const {
+    pagedActivities,
+    isLoadingActivities: isPendingActivities,
+    errorPagedActivities,
+  } = useGetActivities()
 
   const activities = useMemo(() => {
     return pagedActivities?.data ?? []

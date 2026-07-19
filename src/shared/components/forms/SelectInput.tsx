@@ -39,7 +39,7 @@ export function SelectInput<T extends FieldValues>({
     if (selected) {
       field.onChange(selected.value)
     } else {
-      field.onChange('') // or whatever default, maybe empty string
+      field.onChange("") // or whatever default, maybe empty string
     }
   }
 
@@ -54,11 +54,15 @@ export function SelectInput<T extends FieldValues>({
         value={selectedItem}
         onValueChange={handleSelect}
       >
-        <ComboboxInput placeholder={placeholder || "Select..."} aria-invalid={!!error} disabled={props.disabled} />
+        <ComboboxInput
+          placeholder={placeholder || "Select..."}
+          aria-invalid={!!error}
+          disabled={props.disabled}
+        />
         <ComboboxContent>
           <ComboboxEmpty>No items found.</ComboboxEmpty>
           <ComboboxList>
-            {(item) => (
+            {item => (
               <ComboboxItem key={item.value} value={item}>
                 {item.label}
               </ComboboxItem>

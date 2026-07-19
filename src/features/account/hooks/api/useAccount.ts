@@ -1,9 +1,9 @@
 import agent from "@/shared/services/agent"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import type { LoginRequest } from "@account/schemas/request/LoginRequest"
-import type { RegisterUserRequest } from "../../schemas/request/RegisterUserRequest";
-import { toast } from "sonner";
-import { useNavigate } from "react-router";
+import type { RegisterUserRequest } from "@account/schemas/request/RegisterUserRequest"
+import { toast } from "sonner"
+import { useNavigate } from "react-router"
 
 export const useLoginAccount = () => {
   const queryClient = useQueryClient()
@@ -34,7 +34,7 @@ export const useRegisterAccount = () => {
     },
     onSuccess: async () => {
       toast.success("Registered successfully - you can now login")
-      navigate('/login')
+      navigate("/login")
     },
   })
 

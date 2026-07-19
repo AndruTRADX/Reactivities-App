@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router"
-import App from "../layout/App"
+import App from "@/app/layout/App"
 import HomePage from "@/features/home/HomePage"
 import ActivityPage from "@/features/activities/ActivityPage"
 import CreateActivityPage from "@/features/activities/pages/create/CreateActivityPage"

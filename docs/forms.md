@@ -423,6 +423,7 @@ import { useNavigate } from "react-router"
 import { Button } from "@sharedUi/button"
 import { Spinner } from "@sharedUi/spinner"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@sharedUi/card"
+import { FieldDescription, FieldGroup, FieldSeparator } from "@sharedUi/field"
 import TextInput from "@sharedForms/TextInput"
 
 import { EntityRequestSchema, type EntityRequest } from "@<feature>/schemas/request/EntityRequest"
@@ -460,13 +461,22 @@ export default function EntityForm() {
       </CardHeader>
       <CardContent>
         <form id="entity-form" onSubmit={form.handleSubmit(onSubmit)}>
-          <TextInput
-            control={form.control}
-            name="name"
-            label="Name"
-            placeholder="Enter name"
-          />
+          <FieldGroup>
+            <TextInput
+              control={form.control}
+              name="name"
+              label="Name"
+              placeholder="Enter name"
+            />
+            <FieldGroup>
         </form>
+
+        <FieldSeparator className="my-4" /> {/* (if needed) */}
+
+        <FieldDescription className="text-center">
+          Description (if needed)
+        </FieldDescription>
+      </CardContent>
       </CardContent>
       <CardFooter className="justify-end">
         <Button type="submit" form="entity-form" disabled={isDisabled}>

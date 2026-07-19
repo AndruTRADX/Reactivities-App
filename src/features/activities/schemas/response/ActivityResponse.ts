@@ -1,5 +1,5 @@
 import { z } from "zod"
-import { ActivityEventTypeSchema } from "../enums/ActivityEventType"
+import { ActivityEventTypeSchema } from "@activities/schemas/enums/ActivityEventType"
 import { AttendeesResponseSchema } from "./AttendeesResponse"
 
 export const ActivityResponseSchema = z.object({
@@ -13,7 +13,13 @@ export const ActivityResponseSchema = z.object({
   latitude: z.coerce.number(),
   longitude: z.coerce.number(),
   currentStatus: ActivityEventTypeSchema,
-  attendees: z.array(AttendeesResponseSchema)
+  attendees: z.array(AttendeesResponseSchema),
+
+  // Calculated properties
+  isHost: z.boolean().nullable(),
+  isGoing: z.boolean().nullable(),
+  hostId: z.string(),
+  hostDisplayName: z.string(),
 })
 
 export type ActivityResponse = z.infer<typeof ActivityResponseSchema>
