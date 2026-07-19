@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(npx eslint *)",
+      "Bash(git stash *)",
+      "Bash(node --experimental-vm-modules -e \"import\\('./eslint.config.js'\\).then\\(m => console.log\\(JSON.stringify\\(m.default.length\\)\\)\\)\")",
+      "Bash(node -e ' *)",
+      "Bash(find node_modules/.pnpm -maxdepth 1 -iname \"eslint-plugin-react-refresh*\")",
+      "Bash(node -e \"console.log\\(require\\('eslint-plugin-react-refresh/package.json'\\).version\\)\")",
+      "Bash(node -e \"console.log\\(require\\('./package.json'\\).prettier\\)\")",
+      "Bash(grep -E \"^[A-Z]:\\\\\\\\\\\\\\\\\")",
+      "Bash(npx prettier *)",
+      "Bash(file src/shared/components/ui/badge.tsx)",
+      "Bash(git checkout *)",
+      "Bash(curl -s \"https://us1.locationiq.com/v1/autocomplete?key=pk.f8ae3386bc4d78ff6a74f894ecb408ba&q=London&limit=2&dedupe=1&format=json&\")"
+    ]
+  }
+}
