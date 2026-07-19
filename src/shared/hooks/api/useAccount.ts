@@ -1,7 +1,7 @@
 import type { UserResponse } from "@sharedSchemas/response/UserResponse"
 import agent from "@/shared/services/agent"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router"
 
 export const useGetCurrentUser = () => {
   const { data, isLoading, error } = useQuery<UserResponse | null>({

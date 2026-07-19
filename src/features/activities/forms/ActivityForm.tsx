@@ -26,8 +26,9 @@ import {
 import type { ActivityResponse } from "@activities/schemas/response/ActivityResponse"
 import { useCreateActivity, useUpdateActivity } from "@activities/hooks/api/useActivities"
 import { useNavigate } from "react-router"
-import LocationInput from "@/shared/components/forms/LocationInput"
-import { SelectInput } from "@/shared/components/forms/SelectInput"
+import LocationInput from "@sharedForms/LocationInput"
+import { SelectInput } from "@sharedForms/SelectInput"
+import { FieldGroup } from "@sharedUi/field"
 
 interface Props {
   activity?: ActivityResponse
@@ -141,41 +142,43 @@ export default function ActivityForm({ activity }: Props) {
       </CardHeader>
       <CardContent>
         <form id="activity-form" onSubmit={form.handleSubmit(onSubmit)}>
-          <TextInput
-            label="Title"
-            control={form.control}
-            name="title"
-            placeholder="Enter activity title"
-          />
-          <TextInput
-            label="Description"
-            control={form.control}
-            name="description"
-            multiline
-            rows={3}
-            placeholder="Enter a detailed description"
-          />
-          <SelectInput
-            label="Category"
-            control={form.control}
-            name="category"
-            placeholder="Pick a category"
-            items={categories}
-          />
-          <DateInput
-            label="Date"
-            control={form.control}
-            name="date"
-            placeholder="Enter activity date"
-            withTime
-            fromDate={new Date()}
-          />
-          <LocationInput
-            label="Location"
-            control={form.control}
-            name="location"
-            placeholder="Search for a venue or place"
-          />
+          <FieldGroup>
+            <TextInput
+              label="Title"
+              control={form.control}
+              name="title"
+              placeholder="Enter activity title"
+            />
+            <TextInput
+              label="Description"
+              control={form.control}
+              name="description"
+              multiline
+              rows={3}
+              placeholder="Enter a detailed description"
+            />
+            <SelectInput
+              label="Category"
+              control={form.control}
+              name="category"
+              placeholder="Pick a category"
+              items={categories}
+            />
+            <DateInput
+              label="Date"
+              control={form.control}
+              name="date"
+              placeholder="Enter activity date"
+              withTime
+              fromDate={new Date()}
+            />
+            <LocationInput
+              label="Location"
+              control={form.control}
+              name="location"
+              placeholder="Search for a venue or place"
+            />
+          </FieldGroup>
         </form>
       </CardContent>
       <CardFooter className="flex gap-2 justify-end">

@@ -8,10 +8,17 @@ type BaseProps<T extends FieldValues> = {
   description?: string
 } & UseControllerProps<T>
 
-type TextInputProps<T extends FieldValues> = BaseProps<T> & (
-  | ({ multiline?: false } & Omit<React.InputHTMLAttributes<HTMLInputElement>, "defaultValue" | "name">)
-  | ({ multiline: true; rows?: number } & Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "defaultValue" | "name">)
-)
+type TextInputProps<T extends FieldValues> = BaseProps<T> &
+  (
+    | ({ multiline?: false } & Omit<
+        React.InputHTMLAttributes<HTMLInputElement>,
+        "defaultValue" | "name"
+      >)
+    | ({ multiline: true; rows?: number } & Omit<
+        React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+        "defaultValue" | "name"
+      >)
+  )
 
 export default function TextInput<T extends FieldValues>({
   label,
@@ -45,10 +52,7 @@ export default function TextInput<T extends FieldValues>({
           rows={"rows" in props ? props.rows : 3}
         />
       ) : (
-        <Input
-          {...(props as React.InputHTMLAttributes<HTMLInputElement>)}
-          {...commonProps}
-        />
+        <Input {...(props as React.InputHTMLAttributes<HTMLInputElement>)} {...commonProps} />
       )}
 
       {error && <FieldError>{error.message}</FieldError>}

@@ -9,4 +9,6 @@ export const createProblemDetailsResponseSchema = <T extends z.ZodTypeAny>(dataS
     errors: z.record(z.string(), z.array(z.string())).nullable(),
   })
 
-export type ProblemDetailsResponse<T> = z.infer<ReturnType<typeof createProblemDetailsResponseSchema<z.ZodType<T>>>>
+export type ProblemDetailsResponse<T> = z.infer<
+  ReturnType<typeof createProblemDetailsResponseSchema<z.ZodType<T>>>
+>

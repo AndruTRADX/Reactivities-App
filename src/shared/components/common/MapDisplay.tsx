@@ -1,5 +1,5 @@
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet"
-import 'leaflet/dist/leaflet.css'
+import "leaflet/dist/leaflet.css"
 
 type Props = {
   position: [number, number]
@@ -7,16 +7,11 @@ type Props = {
 }
 
 export default function MapDisplay({ position, venue }: Props) {
-
   return (
-    <MapContainer center={position} zoom={13} scrollWheelZoom={false} style={{ height: '100%' }}>
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+    <MapContainer center={position} zoom={13} scrollWheelZoom={false} style={{ height: "100%" }}>
+      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
       <Marker position={position}>
-        <Popup>
-          {venue}
-        </Popup>
+        <Popup>{venue}</Popup>
       </Marker>
     </MapContainer>
   )

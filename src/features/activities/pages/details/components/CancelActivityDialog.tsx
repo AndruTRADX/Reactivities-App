@@ -15,7 +15,7 @@ import TextInput from "@sharedForms/TextInput"
 import {
   CancelActivityRequestSchema,
   type CancelActivityRequest,
-} from "../../../schemas/request/CancelActivityRequest"
+} from "@activities/schemas/request/CancelActivityRequest"
 
 interface Props {
   open: boolean
@@ -30,17 +30,25 @@ export function CancelActivityDialog({ open, onOpenChange, onConfirm, isPending 
     defaultValues: { reason: "" },
   })
 
-  const { formState: { isValid } } = form
+  const {
+    formState: { isValid },
+  } = form
 
-  const handleOpenChange = useCallback((next: boolean) => {
-    if (!next) form.reset()
-    onOpenChange(next)
-  }, [form, onOpenChange])
+  const handleOpenChange = useCallback(
+    (next: boolean) => {
+      if (!next) form.reset()
+      onOpenChange(next)
+    },
+    [form, onOpenChange]
+  )
 
-  const onSubmit = useCallback(async (data: CancelActivityRequest) => {
-    await onConfirm(data)
-    form.reset()
-  }, [onConfirm, form])
+  const onSubmit = useCallback(
+    async (data: CancelActivityRequest) => {
+      await onConfirm(data)
+      form.reset()
+    },
+    [onConfirm, form]
+  )
 
   const isSubmitting = useMemo(() => isPending, [isPending])
   const isDisabled = useMemo(() => isPending || !isValid, [isPending, isValid])

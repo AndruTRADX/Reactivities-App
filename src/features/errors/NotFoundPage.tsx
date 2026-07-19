@@ -22,10 +22,14 @@ export default function NotFoundPage() {
           <HugeiconsIcon icon={Cancel} stroke="2" />
         </EmptyMedia>
         <EmptyTitle>{state?.title ?? "Content not found"}</EmptyTitle>
-        <EmptyDescription>{state?.message ?? "The content you are looking for has not been found"}</EmptyDescription>
+        <EmptyDescription>
+          {state?.message ?? "The content you are looking for has not been found"}
+        </EmptyDescription>
       </EmptyHeader>
       <EmptyContent className="flex-row justify-center gap-2">
-        <Button onClick={() => navigate("/activities")} size='lg'>Go to the activities</Button>
+        <Button onClick={() => navigate("/activities")} size="lg">
+          Go to the activities
+        </Button>
       </EmptyContent>
     </Empty>
   )

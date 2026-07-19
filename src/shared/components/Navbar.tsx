@@ -1,9 +1,15 @@
-import { LaptopIcon, LogoutCircle01Icon, ServerStack03Icon, UserCircleIcon, UserSearch } from "@hugeicons/core-free-icons"
+import {
+  LaptopIcon,
+  LogoutCircle01Icon,
+  ServerStack03Icon,
+  UserCircleIcon,
+  UserSearch,
+} from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Button } from "@sharedUi/button"
 import { NavLink, useNavigate } from "react-router"
-import { cn } from "../lib/utils"
-import { useGetCurrentUser, useLogoutAccount } from "../hooks/api/useAccount"
+import { cn } from "@/shared/lib/utils"
+import { useGetCurrentUser, useLogoutAccount } from "@sharedHooks/api/useAccount"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +31,7 @@ export default function Navbar() {
   }, [logoutAccountAsync])
 
   return (
-    <nav className="z-50 fixed w-full flex justify-between px-5.5 py-2.5 bg-primary-foreground/50 backdrop-blur-xs">
+    <nav className="z-50 fixed w-full flex justify-between px-5.5 py-2.5 bg-primary-foreground/35 backdrop-blur-xl">
       <NavLink to="/" end>
         {({ isActive }) => (
           <Button
@@ -113,7 +119,9 @@ export default function Navbar() {
       ) : (
         <div className="flex gap-2 items-center">
           <Button onClick={() => navigate("/login")}>Sign In</Button>
-          <Button onClick={() => navigate("/register")} variant='outline'>Register</Button>
+          <Button onClick={() => navigate("/register")} variant="outline">
+            Register
+          </Button>
         </div>
       )}
     </nav>

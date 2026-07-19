@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse, type AxiosError } from "axios"
-import type { ApiResponse } from "../schemas/response/ApiResponse"
-import type { ProblemDetailsResponse } from "../schemas/response/ProblemDetailsResponse"
+import type { ApiResponse } from "@sharedSchemas/response/ApiResponse"
+import type { ProblemDetailsResponse } from "@sharedSchemas/response/ProblemDetailsResponse"
 import { toast } from "sonner"
 import { router } from "@/app/router/Route"
 
@@ -25,7 +25,7 @@ const STATUS_LABELS: Record<number, string> = {
 
 const agent = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true
+  withCredentials: true,
 })
 
 agent.interceptors.response.use(

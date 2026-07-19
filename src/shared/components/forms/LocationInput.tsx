@@ -49,10 +49,12 @@ export default function LocationInput<T extends FieldValues>({
     }
     setLoading(true)
     try {
-      const res = await axios.get(locationIqUrl(q))
-      const data = Array.isArray(res) ? res : (res as any).data
-      setSuggestions(Array.isArray(data) ? data : [])
-    } catch (error) {
+      // agent.ts's axios module augmentation is global, so TS thinks this returns
+      // LocationIQSuggestion[] directly — but this plain `axios` import has no
+      // response interceptor to unwrap it, so it's really an AxiosResponse at runtime.
+      const res = (await axios.get(locationIqUrl(q))) as unknown as { data: LocationIQSuggestion[] }
+      setSuggestions(Array.isArray(res.data) ? res.data : [])
+    } catch {
       setSuggestions([])
     } finally {
       setLoading(false)
@@ -124,7 +126,7 @@ export default function LocationInput<T extends FieldValues>({
                 value={item.place_id}
                 onSelect={() => handleSelect(item.place_id)}
               >
-                <HugeiconsIcon icon={MapPin}  />
+                <HugeiconsIcon icon={MapPin} />
                 {item.display_name}
               </CommandItem>
             ))}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react"
+import { useState, useMemo } from "react"
 import { format } from "date-fns"
 import type { Matcher } from "react-day-picker"
 import { Calendar01Icon } from "@hugeicons/core-free-icons"
@@ -37,17 +37,20 @@ export default function DateInput<T extends FieldValues>({
 
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [timeString, setTimeString] = useState<string>("")
+  const [prevValue, setPrevValue] = useState(value)
 
-  useEffect(() => {
+  if (value !== prevValue) {
+    setPrevValue(value)
     if (value) {
-      const date = (value as any) instanceof Date ? (value as Date) : new Date(value as any)
+      const rawValue = value as unknown
+      const date = rawValue instanceof Date ? rawValue : new Date(rawValue as string | number)
       setSelectedDate(date)
       setTimeString(format(date, "HH:mm:ss"))
     } else {
       setSelectedDate(undefined)
       setTimeString("")
     }
-  }, [value])
+  }
 
   const startMonth = useMemo(() => {
     return fromDate ? new Date(fromDate.getFullYear(), fromDate.getMonth(), 1) : undefined

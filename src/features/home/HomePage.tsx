@@ -1,4 +1,4 @@
-import FormWrapper from "@/shared/components/common/FormWrapper";
+import FormWrapper from "@/shared/components/common/FormWrapper"
 import { Activity } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Button } from "@sharedUi/button"
@@ -12,9 +12,11 @@ export default function HomePage() {
         <CardHeader className="text-center">
           <CardTitle className="flex justify-center items-center gap-2 text-4xl font-bold">
             <HugeiconsIcon icon={Activity} size={44} className="text-primary" />
-            Reactivities</CardTitle>
+            Reactivities
+          </CardTitle>
           <CardDescription className="text-base mt-3">
-            Discover and join activities in your community. Connect with others and make memorable experiences.
+            Discover and join activities in your community. Connect with others and make memorable
+            experiences.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex justify-center pt-6">

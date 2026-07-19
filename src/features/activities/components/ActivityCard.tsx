@@ -3,14 +3,30 @@ import { Button } from "@sharedUi/button"
 import type { ActivityResponse } from "@activities/schemas/response/ActivityResponse"
 import { useNavigate } from "react-router"
 import { format } from "date-fns"
-import { Avatar, AvatarFallback, AvatarImage } from "@sharedUi/avatar"
+import { Avatar, AvatarFallback, AvatarGroup, AvatarImage } from "@sharedUi/avatar"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Clock, Location } from "@hugeicons/core-free-icons"
-import { Badge } from "@/shared/components/ui/badge"
+import { Badge } from "@sharedUi/badge"
+import { ProfileCard } from "@/shared/components/common/ProfileCard"
 
 interface Props {
   activity: ActivityResponse
 }
+
+const getBadges = (activity: ActivityResponse) =>
+  [
+    activity.currentStatus === "Cancelled" && [
+      "Cancelled",
+      "text-destructive bg-destructive/25 border border-destructive",
+    ],
+    activity.currentStatus === "Completed" && [
+      "Completed",
+      "text-positive bg-positive/25 border border-positive",
+    ],
+    activity.isHost && ["You are hosting", "text-warning bg-warning/25 border border-warning"],
+    activity.isGoing &&
+      !activity.isHost && ["You are going", "text-primary bg-primary/25 border border-primary"],
+  ].filter(Boolean) as [string, string][]
 
 export default function ActivityCard({ activity }: Props) {
   const navigate = useNavigate()
@@ -19,31 +35,29 @@ export default function ActivityCard({ activity }: Props) {
     <Card className="mx-auto w-full overflow-hidden gap-3" key={activity.id}>
       <div className="flex px-7 gap-4 items-center">
         <Avatar className="w-16 h-16">
-          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" className="grayscale" />
-          <AvatarFallback>CN</AvatarFallback>
+          <AvatarImage src="https://github.com/shadcn.png" alt={activity.hostDisplayName} />
+          <AvatarFallback>{activity.hostDisplayName}</AvatarFallback>
         </Avatar>
 
         <div className="w-full">
           <CardTitle className="font-semibold flex items-center justify-between gap-2">
             {activity.title}
-            {activity.currentStatus === "Cancelled" && (
-              <Badge variant="destructive" className="text-destructive border border-destructive">
-                Cancelled
-              </Badge>
-            )}
-            {activity.currentStatus === "Completed" && (
-              <Badge
-                variant="default"
-                className="text-positive bg-positive/25 border border-positive"
-              >
-                Completed
-              </Badge>
-            )}
+            <div className="flex gap-1.5 items-center">
+              {getBadges(activity).map(([label, className]) => (
+                <Badge key={label} variant="default" className={className}>
+                  {label}
+                </Badge>
+              ))}
+            </div>
           </CardTitle>
           <CardDescription>
             Hosted by{" "}
-            <Button variant="link" className="px-0">
-              Bob
+            <Button
+              variant="link"
+              className="px-0"
+              onClick={() => navigate(`/profiles/${activity.hostId}`)}
+            >
+              {activity.hostDisplayName}
             </Button>
           </CardDescription>
         </div>
@@ -60,7 +74,13 @@ export default function ActivityCard({ activity }: Props) {
           </div>
         </div>
       </CardContent>
-      <CardContent className="text-muted-foreground">Attendees go here</CardContent>
+      <CardContent>
+        <AvatarGroup>
+          {activity.attendees.map(attendee => (
+            <ProfileCard user={attendee.user} />
+          ))}
+        </AvatarGroup>
+      </CardContent>
       <CardContent className="text-muted-foreground">
         <p>{activity.description}</p>
       </CardContent>

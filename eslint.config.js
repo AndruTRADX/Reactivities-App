@@ -23,11 +23,22 @@ export default defineConfig([
     },
     plugins: {
       "react-hooks": reactHooks,
-      "react-refresh": reactRefresh,
       prettier: prettierPlugin,
     },
     rules: {
       "prettier/prettier": "error",
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["../**"],
+              message:
+                "Parent-relative imports are not allowed — use a path alias instead (see docs/path-aliases.md).",
+            },
+          ],
+        },
+      ],
     },
   },
   prettierConfig,
