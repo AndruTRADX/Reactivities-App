@@ -89,6 +89,56 @@ export const useDoEntity = () => {
 
   Both the hook's `onSuccess` and the call-site `onSuccess` run — React Query calls them in that order. Put cache invalidation in the hook; put UI feedback that's specific to one usage at the call site.
 
+### Optimistic updates — `useOptimisticUpdate`
+
+Some mutations should update the UI immediately instead of waiting for the server round-trip (e.g. joining/leaving something, toggling a flag). Do this with the shared hook at `src/shared/hooks/useOptimisticUpdate.ts` (`@sharedHooks/useOptimisticUpdate`) rather than hand-rolling `onMutate`/`onError` per mutation hook — the cancel/snapshot/rollback plumbing is identical every time, and hand-rolling it is where subtle race conditions and copy-paste drift creep in.
+
+```ts
+export const useDoEntity = () => {
+  const queryClient = useQueryClient()
+
+  const { onMutate, onError } = useOptimisticUpdate<EntityResponse, { id: string }>({
+    optimisticQueryKey: ({ id }) => ["entity", id],
+    relatedQueryKeysToCancel: () => [["entities"]],
+    updater: (entity, { id }) => ({ ...entity /* the optimistic change */ }),
+  })
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async ({ id }: { id: string }) => {
+      return await agent.post(`/entities/${id}/do`, { id })
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["entities"] })
+    },
+    onMutate,
+    onError,
+  })
+
+  return {
+    doEntityAsync: mutateAsync,
+    isPendingDoEntity: isPending,
+  }
+}
+```
+
+- **`optimisticQueryKey` vs `relatedQueryKeysToCancel` — the key distinction of this hook:**
+
+  | | `optimisticQueryKey` | `relatedQueryKeysToCancel` |
+  |---|---|---|
+  | Cardinality | Exactly one | Zero or more |
+  | Cancelled before mutating | Yes | Yes |
+  | Read via `getQueryData` and snapshotted | Yes | No |
+  | Hand-edited via `updater` | Yes | No |
+  | Restored in `onError` | Yes | No — never touched again |
+
+  `optimisticQueryKey` identifies the single cache entry you're hand-editing — the same `queryKey` shape [used everywhere else](#querykey--the-cache-identity). It's the one entry that gets read, mutated, and — if the server rejects the mutation — rolled back to its snapshot.
+
+  `relatedQueryKeysToCancel` is for *other* cached views of the same data that you are **not** editing (e.g. a list that shows the entity but whose shape you're not hand-updating). They're only cancelled, to close the race window where an in-flight background refetch could land mid-mutation and overwrite your optimistic write with stale data. Nothing about them is snapshotted or restored — once the mutation settles, bringing them back in sync is `onSuccess`/`invalidateQueries`' job, not this hook's.
+
+- `updater` is the only mutation-specific part: given the current cached data and the mutation's variables, return the new data. Keep it a pure, synchronous transform — no side effects.
+- The hook returns `{ onMutate, onError }` ready to spread straight into `useMutation`. If the mutation also needs `onSuccess` (e.g. to invalidate a list after the server confirms), add it alongside — all three can coexist, same as the plain mutation template above.
+- Only wire up `useOptimisticUpdate` when the mutation actually benefits from instant feedback. A mutation with only server-side side effects and no relevant cached view (e.g. sending an email) should stay with the plain [mutation hook template](#mutation-hook-template) and `onSuccess`/`invalidateQueries`.
+
 ### Naming conventions
 
 | Raw React Query field | Renamed to | Example |

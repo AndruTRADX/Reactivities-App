@@ -77,7 +77,18 @@ A feature with its own non-sort filters (a category, a status, a "going"/"hostin
 Owns the current page — and, optionally, sort — as URL state (`useSearchParams`), not component state or a Zustand store — this makes list pages shareable/bookmarkable and keeps browser back/forward working.
 
 ```ts
-export const usePagedParams = <TSort extends string = string>(key: string, defaultPageSize = 10) => {
+type PagedParams<TSort extends string> = {
+  pageIndex: number
+  pageSize: number
+  sort: TSort | undefined
+  setPageIndex: (nextPageIndex: number) => void
+  setSort: (nextSort: TSort) => void
+}
+
+export const usePagedParams = <TSort extends string = string>(
+  key: string,
+  defaultPageSize = 10
+): PagedParams<TSort> => {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const pageIndex = Number(searchParams.get(`${key}PageIndex`) ?? 1)
@@ -104,6 +115,8 @@ export const usePagedParams = <TSort extends string = string>(key: string, defau
   return { pageIndex, pageSize, sort, setPageIndex, setSort }
 }
 ```
+
+The real file also carries a JSDoc comment above `usePagedParams` and each `PagedParams` field — that's what shows up as an editor hover tooltip at every call site (`key`, `defaultPageSize`, and each returned field). The prose below is the fuller "why," which doesn't belong in a tooltip.
 
 **`key` is required, not optional.** It namespaces the URL params (`?entitiesPageIndex=2` vs `?itemsPageIndex=1`). Without it, any two paginated lists that end up on the same page — now or in some future change — would silently read and write the same `pageIndex`/`pageSize`/`sort` query params and stomp on each other. Making it required means every call site has to name its list, so the collision can't happen by accident. Pick a short, unique-per-page string that names the list, e.g. `"entities"` or `"items"`.
 

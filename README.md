@@ -52,6 +52,7 @@ Before writing any form, hook, or schema, read the relevant doc:
 
 | Topic | Doc |
 |---|---|
+| Pages (naming, feature folder structure, routing) | [docs/pages.md](./docs/pages.md) |
 | Path aliases | [docs/path-aliases.md](./docs/path-aliases.md) |
 | Zod schemas (request & response) | [docs/schemas.md](./docs/schemas.md) |
 | Forms (React Hook Form, components, skeleton) | [docs/forms.md](./docs/forms.md) |
@@ -60,4 +61,5 @@ Before writing any form, hook, or schema, read the relevant doc:
 | Theming (colors, dark mode, backdrop-blur) | [docs/theming.md](./docs/theming.md) |
 | UI components (shadcn, where new components live) | [docs/ui-components.md](./docs/ui-components.md) |
 | Loading states (skeletons) | [docs/loading-states.md](./docs/loading-states.md) |
+| Confirm dialog (global confirmation, useConfirmDialog) | [docs/confirm-dialog.md](./docs/confirm-dialog.md) |
 | Backend context (CQRS, ApiResponse, validation) | [docs/backend-context.md](./docs/backend-context.md) |
