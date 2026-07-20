@@ -63,3 +63,11 @@ Before writing any form, hook, or schema, read the relevant doc:
 | Loading states (skeletons) | [docs/loading-states.md](./docs/loading-states.md) |
 | Confirm dialog (global confirmation, useConfirmDialog) | [docs/confirm-dialog.md](./docs/confirm-dialog.md) |
 | Backend context (CQRS, ApiResponse, validation) | [docs/backend-context.md](./docs/backend-context.md) |
+
+## Integrations
+
+Third-party service integrations (their own API client, config, and gotchas) are documented separately from the app's own business-logic conventions above, under `docs/integrations/`:
+
+| Service | Doc |
+|---|---|
+| LocationIQ (address search & geocoding) | [docs/integrations/location-iq.md](./docs/integrations/location-iq.md) |
