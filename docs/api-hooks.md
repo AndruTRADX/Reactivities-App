@@ -27,6 +27,80 @@ Axios was chosen for one primary reason: **interceptors**. The interceptor patte
 
 ---
 
+## Hook syntax conventions
+
+Every API hook lives under a feature's `hooks/api/` folder (or `src/shared/hooks/api/` for cross-cutting data like the current user). Two shapes cover every case: a **query hook** for reads and a **mutation hook** for writes.
+
+### Query hook template
+
+```ts
+export const useGetThing = (id: string | undefined) => {
+  const { data, isLoading, error } = useQuery<ThingResponse>({
+    queryKey: ["thing", id],
+    queryFn: () => agent.get<ThingResponse>(`/things/${id}`),
+    enabled: !!id,
+  })
+
+  return {
+    thing: data,
+    isLoadingThing: isLoading,
+    errorThing: error,
+  }
+}
+```
+
+- `queryFn` calls `agent` directly and returns its result — no manual unwrapping (see [module augmentation](#module-augmentation--removing-the-axiosresponse-wrapper) above).
+- The hook never returns the raw `{ data, isLoading, error }` tuple. It renames every field to say what it is: `data` → `thing`, `isLoading` → `isLoadingThing`, `error` → `errorThing`. This makes it safe to call two hooks side by side in a component without destructuring collisions.
+- If the query depends on an id that might be `undefined`, set `enabled: !!id` rather than skipping the hook call — hooks can't be called conditionally.
+- Use `select` to reshape or enrich the response (e.g. `withUserContext` in `useGetActivityById`) instead of doing that work in the component.
+
+### Mutation hook template
+
+```ts
+export const useDoThing = () => {
+  const queryClient = useQueryClient()
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (request: DoThingRequest) => {
+      return await agent.post("/things", request)
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["things"] })
+    },
+  })
+
+  return {
+    doThingAsync: mutateAsync,
+    isPendingDoThing: isPending,
+  }
+}
+```
+
+- Same renaming rule as query hooks: `mutateAsync` → `<verb><Noun>Async`, `isPending` → `isPending<Verb><Noun>`.
+- `mutationFn` is always `async` and always just calls `agent` and returns — no try/catch (the [error interceptor](#error-interceptor--centralized-http-error-handling) owns that).
+- The hook-level `onSuccess` is for cache consistency (`invalidateQueries`/`removeQueries`) and hook-scoped side effects that must always run (e.g. `navigate` on logout). It does **not** take the calling component's context.
+- Callers can pass a second argument to the returned `*Async` function for one-off, call-site behavior (a toast, closing a dialog) without touching the hook:
+
+  ```ts
+  await joinActivityAsync(
+    { id: activity.id },
+    { onSuccess: () => toast.success("You're now going to this activity") }
+  )
+  ```
+
+  Both the hook's `onSuccess` and the call-site `onSuccess` run — React Query calls them in that order. Put cache invalidation in the hook; put UI feedback that's specific to one usage at the call site.
+
+### Naming conventions
+
+| Raw React Query field | Renamed to | Example |
+|---|---|---|
+| `data` (query) | `<noun>` | `activity`, `pagedActivities`, `user` |
+| `isLoading` (query) | `isLoading<Noun>` | `isLoadingActivity` |
+| `error` (query) | `error<Noun>` | `errorActivity` |
+| `mutateAsync` | `<verb><Noun>Async` | `joinActivityAsync`, `cancelActivityAsync` |
+| `isPending` (mutation) | `isPending<Verb><Noun>` | `isPendingJoinActivity` |
+
+Hook function names follow the same verb: `useGetX`, `useCreateX`, `useUpdateX`, `useCancelX`, `useJoinX`, `useLeaveX`. This keeps the hook name, its returned field names, and its purpose all readable at the call site without needing to open the hook file.
+
 ## `agent.ts` — the HTTP client in detail
 
 Located at `src/shared/services/agent.ts`. Every API call in the app goes through this single axios instance.
@@ -300,77 +374,3 @@ onSuccess: async () => {
 ```
 
 ---
-
-## Hook syntax conventions
-
-Every API hook lives under a feature's `hooks/api/` folder (or `src/shared/hooks/api/` for cross-cutting data like the current user). Two shapes cover every case: a **query hook** for reads and a **mutation hook** for writes.
-
-### Query hook template
-
-```ts
-export const useGetThing = (id: string | undefined) => {
-  const { data, isLoading, error } = useQuery<ThingResponse>({
-    queryKey: ["thing", id],
-    queryFn: () => agent.get<ThingResponse>(`/things/${id}`),
-    enabled: !!id,
-  })
-
-  return {
-    thing: data,
-    isLoadingThing: isLoading,
-    errorThing: error,
-  }
-}
-```
-
-- `queryFn` calls `agent` directly and returns its result — no manual unwrapping (see [module augmentation](#module-augmentation--removing-the-axiosresponse-wrapper) above).
-- The hook never returns the raw `{ data, isLoading, error }` tuple. It renames every field to say what it is: `data` → `thing`, `isLoading` → `isLoadingThing`, `error` → `errorThing`. This makes it safe to call two hooks side by side in a component without destructuring collisions.
-- If the query depends on an id that might be `undefined`, set `enabled: !!id` rather than skipping the hook call — hooks can't be called conditionally.
-- Use `select` to reshape or enrich the response (e.g. `withUserContext` in `useGetActivityById`) instead of doing that work in the component.
-
-### Mutation hook template
-
-```ts
-export const useDoThing = () => {
-  const queryClient = useQueryClient()
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (request: DoThingRequest) => {
-      return await agent.post("/things", request)
-    },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["things"] })
-    },
-  })
-
-  return {
-    doThingAsync: mutateAsync,
-    isPendingDoThing: isPending,
-  }
-}
-```
-
-- Same renaming rule as query hooks: `mutateAsync` → `<verb><Noun>Async`, `isPending` → `isPending<Verb><Noun>`.
-- `mutationFn` is always `async` and always just calls `agent` and returns — no try/catch (the [error interceptor](#error-interceptor--centralized-http-error-handling) owns that).
-- The hook-level `onSuccess` is for cache consistency (`invalidateQueries`/`removeQueries`) and hook-scoped side effects that must always run (e.g. `navigate` on logout). It does **not** take the calling component's context.
-- Callers can pass a second argument to the returned `*Async` function for one-off, call-site behavior (a toast, closing a dialog) without touching the hook:
-
-  ```ts
-  await joinActivityAsync(
-    { id: activity.id },
-    { onSuccess: () => toast.success("You're now going to this activity") }
-  )
-  ```
-
-  Both the hook's `onSuccess` and the call-site `onSuccess` run — React Query calls them in that order. Put cache invalidation in the hook; put UI feedback that's specific to one usage at the call site.
-
-### Naming conventions
-
-| Raw React Query field | Renamed to | Example |
-|---|---|---|
-| `data` (query) | `<noun>` | `activity`, `pagedActivities`, `user` |
-| `isLoading` (query) | `isLoading<Noun>` | `isLoadingActivity` |
-| `error` (query) | `error<Noun>` | `errorActivity` |
-| `mutateAsync` | `<verb><Noun>Async` | `joinActivityAsync`, `cancelActivityAsync` |
-| `isPending` (mutation) | `isPending<Verb><Noun>` | `isPendingJoinActivity` |
-
-Hook function names follow the same verb: `useGetX`, `useCreateX`, `useUpdateX`, `useCancelX`, `useJoinX`, `useLeaveX`. This keeps the hook name, its returned field names, and its purpose all readable at the call site without needing to open the hook file.
