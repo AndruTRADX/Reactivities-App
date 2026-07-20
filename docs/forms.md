@@ -12,7 +12,7 @@ A naive React form looks like this:
 
 ```tsx
 // ❌ What we never do
-function ActivityForm() {
+function EntityForm() {
   const [title, setTitle] = useState("")
   const [titleError, setTitleError] = useState("")
   const [description, setDescription] = useState("")
@@ -35,7 +35,7 @@ function ActivityForm() {
     e.preventDefault()
     if (!validate()) return
     setIsSubmitting(true)
-    await fetch("/api/activities", { method: "POST", body: JSON.stringify({ title, description }) })
+    await fetch("/api/entities", { method: "POST", body: JSON.stringify({ title, description }) })
     setIsSubmitting(false)
   }
 
@@ -234,6 +234,8 @@ const categories = [
 
 Options are defined in the form component, not inside `SelectInput` — the shared component doesn't know what options any specific form needs.
 
+A dropdown that isn't part of a `react-hook-form` form doesn't belong here even though it looks similar — see [ui-components.md](./ui-components.md#where-a-new-component-belongs-forms-vs-common-vs-ui) for where that case (`ComboboxSelect`) lives instead.
+
 #### `DateInput`
 
 The most complex shared component. It maintains its own local React state for the selected date and time string, synced with `field.value` via `useEffect`. This is necessary because the date picker and time input are two separate UI elements that must be combined into a single `Date` value for RHF.
@@ -297,7 +299,7 @@ Why this matters:
 - **Single source of truth.** The validation rule for "title is required" exists in one place. If the rule changes, you change it once.
 - **Consistent error messages.** `requiredString("Title")` always produces `"Title is required"`. A manual `if (!data.title)` check produces whatever string you happen to write that day.
 - **The form component stays clean.** `onSubmit` receives data that has already passed Zod validation — it can trust the shape completely and focus only on what to do with it.
-- **Backend validation is separate.** The backend also validates with FluentValidation. The frontend's Zod validation is not a replacement — it's a UX layer that gives instant feedback without a round trip. Both exist intentionally.
+- **Backend validation is separate.** The backend also validates, with FluentValidation (see [backend-context.md](./backend-context.md)). The frontend's Zod validation is not a replacement — it's a UX layer that gives instant feedback without a round trip. Both exist intentionally.
 
 ---
 
@@ -305,7 +307,7 @@ Why this matters:
 
 The complete data flow from user input to server response:
 
-```
+```planText
 User types in TextInput
        ↓
 useController reads value via ref (no re-render)

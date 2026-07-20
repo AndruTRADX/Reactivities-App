@@ -25,3 +25,8 @@ dist-ssr
 *.sw?
 
 .env.development
+
+# Claude Code — keep only the shared conventions command
+.claude/*
+!.claude/commands
+!.claude/commands/conventions.md

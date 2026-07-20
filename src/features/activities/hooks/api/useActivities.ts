@@ -1,5 +1,6 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { PagedResponse } from "@sharedSchemas/response/PagedResponse"
+import type { ActivitySpecificationParams } from "@activities/schemas/request/ActivitySpecificationParams"
 import agent from "@/shared/services/agent"
 import type { ActivityResponse } from "@activities/schemas/response/ActivityResponse"
 import type { CancelActivityRequest } from "@activities/schemas/request/CancelActivityRequest"
@@ -19,12 +20,13 @@ const withUserContext = <T extends ActivityResponse>(activity: T, userId?: strin
   }
 }
 
-export const useGetActivities = () => {
+export const useGetActivities = (params: ActivitySpecificationParams) => {
   const { user } = useGetCurrentUser()
 
   const { data, isLoading, error } = useQuery<PagedResponse<ActivityResponse>>({
-    queryKey: ["activities"],
-    queryFn: () => agent.get<PagedResponse<ActivityResponse>>("/activities"),
+    queryKey: ["activities", params],
+    queryFn: () => agent.get<PagedResponse<ActivityResponse>>("/activities", { params }),
+    placeholderData: keepPreviousData,
     select: data => ({
       ...data,
       data: data.data.map(activity => withUserContext(activity, user?.id)),

@@ -14,7 +14,7 @@ The key insight is that server data is not "state you own" — it's a snapshot o
 
 - **Cache:** the result of a query is stored by its `queryKey`. Any component that needs the same data gets the cached value instantly instead of making a new request.
 - **Stale-while-revalidate:** cached data is shown immediately, and a background refetch runs to update it. No loading spinner on re-visits.
-- **Deduplication:** if five components mount at the same time and all call `useGetActivityById("123")`, only one HTTP request goes out.
+- **Deduplication:** if five components mount at the same time and all call `useGetEntityById("123")`, only one HTTP request goes out.
 - **Automatic refetch:** when the window regains focus or the network reconnects, stale queries re-fetch in the background.
 
 We use Zustand for client-only UI state (dialogs, themes). We use React Query for anything that comes from the server. Mixing them up — putting server data in Zustand — leads to cache invalidation bugs that are painful to debug.
@@ -34,43 +34,43 @@ Every API hook lives under a feature's `hooks/api/` folder (or `src/shared/hooks
 ### Query hook template
 
 ```ts
-export const useGetThing = (id: string | undefined) => {
-  const { data, isLoading, error } = useQuery<ThingResponse>({
-    queryKey: ["thing", id],
-    queryFn: () => agent.get<ThingResponse>(`/things/${id}`),
+export const useGetEntity = (id: string | undefined) => {
+  const { data, isLoading, error } = useQuery<EntityResponse>({
+    queryKey: ["entity", id],
+    queryFn: () => agent.get<EntityResponse>(`/entities/${id}`),
     enabled: !!id,
   })
 
   return {
-    thing: data,
-    isLoadingThing: isLoading,
-    errorThing: error,
+    entity: data,
+    isLoadingEntity: isLoading,
+    errorEntity: error,
   }
 }
 ```
 
 - `queryFn` calls `agent` directly and returns its result — no manual unwrapping (see [module augmentation](#module-augmentation--removing-the-axiosresponse-wrapper) above).
-- The hook never returns the raw `{ data, isLoading, error }` tuple. It renames every field to say what it is: `data` → `thing`, `isLoading` → `isLoadingThing`, `error` → `errorThing`. This makes it safe to call two hooks side by side in a component without destructuring collisions.
+- The hook never returns the raw `{ data, isLoading, error }` tuple. It renames every field to say what it is: `data` → `entity`, `isLoading` → `isLoadingEntity`, `error` → `errorEntity`. This makes it safe to call two hooks side by side in a component without destructuring collisions.
 - If the query depends on an id that might be `undefined`, set `enabled: !!id` rather than skipping the hook call — hooks can't be called conditionally.
-- Use `select` to reshape or enrich the response (e.g. `withUserContext` in `useGetActivityById`) instead of doing that work in the component.
+- Use `select` to reshape or enrich the response (e.g. attaching derived or related data) instead of doing that work in the component.
 
 ### Mutation hook template
 
 ```ts
-export const useDoThing = () => {
+export const useDoEntity = () => {
   const queryClient = useQueryClient()
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: async (request: DoThingRequest) => {
-      return await agent.post("/things", request)
+    mutationFn: async (request: DoEntityRequest) => {
+      return await agent.post("/entities", request)
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["things"] })
+      await queryClient.invalidateQueries({ queryKey: ["entities"] })
     },
   })
 
   return {
-    doThingAsync: mutateAsync,
-    isPendingDoThing: isPending,
+    doEntityAsync: mutateAsync,
+    isPendingDoEntity: isPending,
   }
 }
 ```
@@ -81,9 +81,9 @@ export const useDoThing = () => {
 - Callers can pass a second argument to the returned `*Async` function for one-off, call-site behavior (a toast, closing a dialog) without touching the hook:
 
   ```ts
-  await joinActivityAsync(
-    { id: activity.id },
-    { onSuccess: () => toast.success("You're now going to this activity") }
+  await cancelEntityAsync(
+    { id: entity.id },
+    { onSuccess: () => toast.success("Entity cancelled") }
   )
   ```
 
@@ -93,11 +93,11 @@ export const useDoThing = () => {
 
 | Raw React Query field | Renamed to | Example |
 |---|---|---|
-| `data` (query) | `<noun>` | `activity`, `pagedActivities`, `user` |
-| `isLoading` (query) | `isLoading<Noun>` | `isLoadingActivity` |
-| `error` (query) | `error<Noun>` | `errorActivity` |
-| `mutateAsync` | `<verb><Noun>Async` | `joinActivityAsync`, `cancelActivityAsync` |
-| `isPending` (mutation) | `isPending<Verb><Noun>` | `isPendingJoinActivity` |
+| `data` (query) | `<noun>` | `entity`, `pagedEntities`, `user` |
+| `isLoading` (query) | `isLoading<Noun>` | `isLoadingEntity` |
+| `error` (query) | `error<Noun>` | `errorEntity` |
+| `mutateAsync` | `<verb><Noun>Async` | `createEntityAsync`, `cancelEntityAsync` |
+| `isPending` (mutation) | `isPending<Verb><Noun>` | `isPendingCancelEntity` |
 
 Hook function names follow the same verb: `useGetX`, `useCreateX`, `useUpdateX`, `useCancelX`, `useJoinX`, `useLeaveX`. This keeps the hook name, its returned field names, and its purpose all readable at the call site without needing to open the hook file.
 
@@ -114,7 +114,7 @@ const agent = axios.create({
 })
 ```
 
-`axios.create()` produces an isolated instance with its own config and interceptors, separate from the global `axios` object. This means the interceptors we attach only apply to our API calls — not to any third-party library that also uses axios (like LocationIQ in `LocationInput`).
+`axios.create()` produces an isolated instance with its own config and interceptors, separate from the global `axios` object. This means the interceptors we attach only apply to our API calls — not to any third-party library that also uses axios elsewhere in the app (e.g. an address-autocomplete widget calling its own provider).
 
 ### Module augmentation — removing the `AxiosResponse` wrapper
 
@@ -122,8 +122,8 @@ By default, axios methods return `Promise<AxiosResponse<T>>`, meaning you'd alwa
 
 ```ts
 // Without augmentation — every hook would need this
-const response = await agent.get<ApiResponse<ActivityResponse>>("/activities/123")
-const activity = response.data.data  // unwrap AxiosResponse, then unwrap ApiResponse
+const response = await agent.get<ApiResponse<EntityResponse>>("/entities/123")
+const entity = response.data.data  // unwrap AxiosResponse, then unwrap ApiResponse
 ```
 
 We override that with a TypeScript module augmentation at the top of `agent.ts`:
@@ -140,7 +140,7 @@ declare module "axios" {
 }
 ```
 
-This tells TypeScript that our axios instance methods return `Promise<T>` directly. Combined with the response interceptor below, calling `agent.get<ActivityResponse>(...)` gives you an `ActivityResponse` with zero unwrapping.
+This tells TypeScript that our axios instance methods return `Promise<T>` directly. Combined with the response interceptor below, calling `agent.get<EntityResponse>(...)` gives you an `EntityResponse` with zero unwrapping.
 
 ### Response interceptor — unwrapping `ApiResponse<T>`
 
@@ -276,9 +276,9 @@ A `queryKey` is the identifier for a cached query. React Query uses it to:
 Always an array. The first element is a string identifier; additional elements narrow the scope:
 
 ```ts
-["activities"]           // the paginated list
-["activity", "abc-123"]  // one specific activity
-["user"]                 // the current authenticated user
+["entities"]           // the paginated list
+["entity", "abc-123"]  // one specific entity
+["user"]                // the current authenticated user
 ```
 
 Using an array enables **partial key matching** for invalidation — more on that below.
@@ -287,11 +287,13 @@ Using an array enables **partial key matching** for invalidation — more on tha
 
 | Data | Key |
 |---|---|
-| Activity list | `["activities"]` |
-| Activity by id | `["activity", id]` |
+| Entity list (paginated) | `["entities", params]` |
+| Entity by id | `["entity", id]` |
 | Current user | `["user"]` |
 
-These must be consistent everywhere. A typo (`"activites"` vs `"activities"`) creates two separate cache entries that never share data and never invalidate each other — a bug that shows stale data silently.
+These must be consistent everywhere. A typo (`"entites"` vs `"entities"`) creates two separate cache entries that never share data and never invalidate each other — a bug that shows stale data silently.
+
+**Paginated lists key on the params object, not a bare string** — see [pagination.md](./pagination.md#3-the-query-hook-shape) for why, and for the full `queryKey`/`placeholderData` shape every paginated query hook follows.
 
 ---
 
@@ -300,7 +302,7 @@ These must be consistent everywhere. A typo (`"activites"` vs `"activities"`) cr
 After a mutation (create, update, cancel), the cached data is stale — it no longer reflects what's on the server. `invalidateQueries` is how you tell React Query that.
 
 ```ts
-await queryClient.invalidateQueries({ queryKey: ["activities"] })
+await queryClient.invalidateQueries({ queryKey: ["entities"] })
 ```
 
 What this actually does:
@@ -311,12 +313,12 @@ What this actually does:
 
 ### Partial key matching
 
-`invalidateQueries` matches by prefix. `{ queryKey: ["activity"] }` would invalidate both `["activity", "abc"]` and `["activity", "xyz"]`. In this project, mutation hooks currently only invalidate the list key. If the detail view also needs to refresh after a write, add a second call:
+`invalidateQueries` matches by prefix. `{ queryKey: ["entity"] }` would invalidate both `["entity", "abc"]` and `["entity", "xyz"]`. In this project, mutation hooks currently only invalidate the list key. If the detail view also needs to refresh after a write, add a second call:
 
 ```ts
 onSuccess: async () => {
-  await queryClient.invalidateQueries({ queryKey: ["activities"] })
-  await queryClient.invalidateQueries({ queryKey: ["activity", id] })
+  await queryClient.invalidateQueries({ queryKey: ["entities"] })
+  await queryClient.invalidateQueries({ queryKey: ["entity", id] })
 }
 ```
 
@@ -342,13 +344,19 @@ Use it when the data should no longer exist in memory at all, not just be refres
 
 ---
 
+## Pagination
+
+Query hooks backing a paginated list (e.g. `useGetEntities`) follow a specific `queryKey`/`placeholderData` shape so that page changes don't fight the cache or flash the skeleton. The full pattern — request shape, URL-driven page state, the query hook shape, and rendering — is documented in **[pagination.md](./pagination.md)**. Read it before adding pagination to any new list.
+
+---
+
 ## Never use `refetch`
 
 `useQuery` returns a `refetch` function. Do not use it.
 
 ```ts
 // ❌ Never do this
-const { data, refetch } = useGetActivities()
+const { data, refetch } = useGetEntities()
 
 const handleSomething = async () => {
   await doSomeMutation()
@@ -360,7 +368,7 @@ const handleSomething = async () => {
 
 `refetch` is **component-scoped and imperative**. Problems:
 
-1. **It only affects the component that called it.** If another component on the page also uses `useGetActivities()`, it won't re-fetch — it will still show stale data.
+1. **It only affects the component that called it.** If another component on the page also uses `useGetEntities()`, it won't re-fetch — it will still show stale data.
 2. **It ignores `staleTime`.** React Query is designed around declaring when data is stale and managing re-fetching automatically. `refetch` overrides that and forces an immediate request regardless of cache state.
 3. **It creates invisible coupling.** The mutation and the query are coupled through the component. If the query moves to a different component, the `refetch` call breaks silently with no type error.
 
@@ -369,7 +377,7 @@ const handleSomething = async () => {
 ```ts
 // ✅ Always do this — in the mutation hook's onSuccess
 onSuccess: async () => {
-  await queryClient.invalidateQueries({ queryKey: ["activities"] })
+  await queryClient.invalidateQueries({ queryKey: ["entities"] })
 }
 ```
 

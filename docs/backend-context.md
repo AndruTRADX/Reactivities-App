@@ -6,17 +6,17 @@ This document covers backend patterns that are relevant when writing frontend co
 
 Every operation is an `IRequest<T>` dispatched by MediatR to its handler. Controllers only call `mediator.Send(...)` — no business logic lives in them.
 
-The base route is `api/[controller]`, so `ActivitiesController` → `api/activities`.
+The base route is `api/[controller]`, so `EntitiesController` → `api/entities`.
 
-### Activities endpoints
+### Entity endpoints
 
 | Method | Route | Body | Returns |
 |---|---|---|---|
-| GET | `/api/activities/{id}` | — | `ApiResponse<EntityResponse>` |
-| GET | `/api/activities` | `[FromQuery]` pagination params | `ApiResponse<PagedResponse<EntityResponse>>` |
-| POST | `/api/activities` | `CreateEntityRequest` | `ApiResponse<string>` (the new id) |
-| PUT | `/api/activities` | `UpdateEntityRequest` | `ApiResponse<Unit>` |
-| PATCH | `/api/activities/{id}/cancel` | `CancelEntityRequest` | `ApiResponse<Unit>` |
+| GET | `/api/entities/{id}` | — | `ApiResponse<EntityResponse>` |
+| GET | `/api/entities` | `[FromQuery]` pagination params | `ApiResponse<PagedResponse<EntityResponse>>` |
+| POST | `/api/entities` | `CreateEntityRequest` | `ApiResponse<string>` (the new id) |
+| PUT | `/api/entities` | `UpdateEntityRequest` | `ApiResponse<Unit>` |
+| PATCH | `/api/entities/{id}/cancel` | `CancelEntityRequest` | `ApiResponse<Unit>` |
 
 ## `ApiResponse<T>` — the response envelope
 
@@ -44,16 +44,16 @@ Validation runs as a MediatR pipeline behavior before the handler executes. On f
 
 ## Request shape: flat in backend, nested in frontend
 
-The backend `CreateEntityRequest` has location fields at the top level:
+A backend request can have related fields at the top level:
 
 ```csharp
-public string Venue { get; set; }
+public string Street { get; set; }
 public string City { get; set; }
 public double Latitude { get; set; }
 public double Longitude { get; set; }
 ```
 
-The frontend groups them into a `location` object so `LocationInput` works as a single controlled field. The flattening happens in `onSubmit` before calling the mutation hook — see [forms.md](./forms.md#locationinput).
+The frontend can group fields like these into a nested object (e.g. `address`) so a single custom shared form component binds them as one controlled field, following the pattern in [forms.md](./forms.md#adding-a-new-shared-component). The flattening back to a flat shape happens in `onSubmit`, before calling the mutation hook.
 
 ## Exception handling
 
