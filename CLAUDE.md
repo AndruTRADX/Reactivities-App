@@ -13,5 +13,6 @@ These rules apply to every new or edited doc in `docs/` and are non-negotiable �
    - **Exception:** a doc describing actual, current infrastructure or config may state the real value — e.g. a real `tsconfig` path alias (`path-aliases.md`), a real `localStorage` key. Genericizing those would make the doc factually wrong. The rule is about illustrative examples of a pattern, not about hiding real config.
 4. **Split overloaded docs.** If a doc accumulates more than one clearly distinct topic (check its own title — if the title needs "and" twice, it's already overloaded), split it before adding more. One doc, one title, one topic.
 5. **Update the index.** Any new or renamed doc must be added/updated in the topic tables in both `README.md` and `.claude/commands/conventions.md`.
+6. **Third-party integrations live in `docs/integrations/`, not `docs/`.** A doc about a specific external service (its own API client, env vars, response shape, gotchas) goes in `docs/integrations/<service>.md`, indexed in its own "Integrations" table, separate from the app's business-logic/architecture docs. Everything else in this file still applies inside `docs/integrations/` too.
 
 Before considering a documentation task done, re-read what you wrote and ask: does any other doc already say this, and did I name-drop a real app entity anywhere?

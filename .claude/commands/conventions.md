@@ -18,6 +18,14 @@ Source of truth for `ReactivitiesApp` conventions. Apply these before writing an
 | Confirm dialog (global confirmation, useConfirmDialog) | [docs/confirm-dialog.md](../../docs/confirm-dialog.md) |
 | Backend context (CQRS, ApiResponse, validation) | [docs/backend-context.md](../../docs/backend-context.md) |
 
+## Integrations
+
+Third-party service integrations live under `docs/integrations/`, separate from the business-logic docs above:
+
+| Service | Doc |
+| --- | --- |
+| LocationIQ (address search & geocoding) | [docs/integrations/location-iq.md](../../docs/integrations/location-iq.md) |
+
 **Writing or editing a doc?** Follow the rules in [CLAUDE.md](../../CLAUDE.md) first — one topic per doc, cross-reference instead of repeating, and never illustrate a pattern with a real app entity (`Activity`, `Attendee`, ...); use `Entity`/`Item` boilerplate instead.
 
 ## Quick rules
