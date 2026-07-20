@@ -2,12 +2,25 @@
 import { create } from "zustand"
 
 export interface ConfirmOptions {
+  /** Dialog heading. */
   title?: string
+
+  /** Body copy explaining what's being confirmed. */
   description?: string
+
+  /** Label for the confirm button. Defaults to the preset used (see `useConfirmDialog`). */
   confirmText?: string
+
+  /** Label for the cancel button. Defaults to `"Cancel"`. */
   cancelText?: string
+
+  /** shadcn `Button` variant for the confirm button. Defaults to `"default"`; `useConfirmDialog`'s `confirmDelete` overrides this to `"destructive"`. */
   confirmVariant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
+
+  /** Runs when the user clicks confirm, before the dialog closes and the `confirm()` promise resolves `true`. Put the actual side effect (the mutation) here. */
   onConfirm?: () => void | Promise<void>
+
+  /** Runs when the user clicks cancel, before the dialog closes and the `confirm()` promise resolves `false`. */
   onCancel?: () => void | Promise<void>
 }
 

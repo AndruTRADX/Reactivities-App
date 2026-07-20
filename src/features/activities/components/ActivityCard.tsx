@@ -18,15 +18,16 @@ const getBadges = (activity: ActivityResponse) =>
     activity.currentStatus === "Cancelled" && [
       "Cancelled",
       "text-destructive bg-destructive/25 border border-destructive",
+      "default",
     ],
     activity.currentStatus === "Completed" && [
       "Completed",
       "text-positive bg-positive/25 border border-positive",
+      "default",
     ],
-    activity.isHost && ["You are hosting", "text-warning bg-warning/25 border border-warning"],
-    activity.isGoing &&
-      !activity.isHost && ["You are going", "text-primary bg-primary/25 border border-primary"],
-  ].filter(Boolean) as [string, string][]
+    activity.isHost && ["You are hosting", "text-foreground", "outline"],
+    activity.isGoing && !activity.isHost && ["You are going", "text-foreground", "outline"],
+  ].filter(Boolean) as [string, string, "default" | "outline"][]
 
 export default function ActivityCard({ activity }: Props) {
   const navigate = useNavigate()
@@ -43,8 +44,8 @@ export default function ActivityCard({ activity }: Props) {
           <CardTitle className="font-semibold flex items-center justify-between gap-2">
             {activity.title}
             <div className="flex gap-1.5 items-center">
-              {getBadges(activity).map(([label, className]) => (
-                <Badge key={label} variant="default" className={className}>
+              {getBadges(activity).map(([label, className, variant]) => (
+                <Badge key={label} variant={variant} className={className}>
                   {label}
                 </Badge>
               ))}
