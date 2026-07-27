@@ -19,6 +19,7 @@ export const ActivityResponseSchema = z.object({
   isHost: z.boolean().nullable(),
   isGoing: z.boolean().nullable(),
   hostId: z.string(),
+  hostImageUrl: z.string(),
   hostDisplayName: z.string(),
 })
 

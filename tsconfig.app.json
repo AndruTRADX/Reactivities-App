@@ -10,6 +10,7 @@
       "@/*": ["./src/*"],
       "@activities/*": ["./src/features/activities/*"],
       "@account/*": ["./src/features/account/*"],
+      "@profile/*": ["./src/features/profile/*"],
       "@sharedUi/*": ["./src/shared/components/ui/*"],
       "@sharedForms/*": ["./src/shared/components/forms/*"],
       "@sharedHooks/*": ["./src/shared/hooks/*"],

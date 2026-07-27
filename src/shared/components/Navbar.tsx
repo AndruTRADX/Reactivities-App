@@ -25,6 +25,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
 import { useCallback } from "react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
 
 export default function Navbar() {
   const { user } = useGetCurrentUser()
@@ -126,7 +127,14 @@ export default function Navbar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
-                <HugeiconsIcon icon={UserCircleIcon} className="text-primary min-w-5" />
+                {user.imageUrl && user.imageUrl !== "" ? (
+                  <Avatar size="sm">
+                    <AvatarImage src={user.imageUrl} alt={user.displayName} />
+                    <AvatarFallback>{user.displayName}</AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <HugeiconsIcon icon={UserCircleIcon} className="text-primary min-w-5" />
+                )}
                 {user.displayName}'s Profile
               </Button>
             </DropdownMenuTrigger>
@@ -134,7 +142,14 @@ export default function Navbar() {
               <DropdownMenuGroup>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuItem>
-                  <HugeiconsIcon icon={UserCircleIcon} className="min-w-5" />
+                  {user.imageUrl ? (
+                    <Avatar size="sm">
+                      <AvatarImage src={user.imageUrl} alt={user.displayName} />
+                      <AvatarFallback>{user.displayName}</AvatarFallback>
+                    </Avatar>
+                  ) : (
+                    <HugeiconsIcon icon={UserCircleIcon} className="text-primary min-w-5" />
+                  )}
                   Profile
                 </DropdownMenuItem>
               </DropdownMenuGroup>

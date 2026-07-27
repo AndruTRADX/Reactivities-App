@@ -8,6 +8,7 @@ import { HugeiconsIcon } from "@hugeicons/react"
 import { Clock, Location } from "@hugeicons/core-free-icons"
 import { Badge } from "@sharedUi/badge"
 import { ProfileCard } from "@/shared/components/common/ProfileCard"
+import { defaultImage64 } from "@/shared/constants/defaultImage"
 
 interface Props {
   activity: ActivityResponse
@@ -25,7 +26,11 @@ const getBadges = (activity: ActivityResponse) =>
       "text-positive bg-positive/25 border border-positive",
       "default",
     ],
-    activity.isHost && ["You are hosting", "text-foreground", "outline"],
+    activity.isHost && [
+      "You are hosting",
+      "border-primary bg-primary/25 text-primary dark:text-foreground",
+      "outline",
+    ],
     activity.isGoing && !activity.isHost && ["You are going", "text-foreground", "outline"],
   ].filter(Boolean) as [string, string, "default" | "outline"][]
 
@@ -35,8 +40,11 @@ export default function ActivityCard({ activity }: Props) {
   return (
     <Card className="mx-auto w-full overflow-hidden gap-3" key={activity.id}>
       <div className="flex px-7 gap-4 items-center">
-        <Avatar className="w-16 h-16">
-          <AvatarImage src="https://github.com/shadcn.png" alt={activity.hostDisplayName} />
+        <Avatar className="w-16 h-16" onClick={() => navigate(`/profile/${activity.hostId}`)}>
+          <AvatarImage
+            src={activity.hostImageUrl ?? defaultImage64}
+            alt={activity.hostDisplayName}
+          />
           <AvatarFallback>{activity.hostDisplayName}</AvatarFallback>
         </Avatar>
 
@@ -56,7 +64,7 @@ export default function ActivityCard({ activity }: Props) {
             <Button
               variant="link"
               className="px-0"
-              onClick={() => navigate(`/profiles/${activity.hostId}`)}
+              onClick={() => navigate(`/profile/${activity.hostId}`)}
             >
               {activity.hostDisplayName}
             </Button>

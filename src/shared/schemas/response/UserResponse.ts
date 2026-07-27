@@ -5,6 +5,7 @@ export const UserResponseSchema = z.object({
   email: z.string(),
   displayName: z.string(),
   imageUrl: z.string().nullable(),
+  biography: z.string().nullable(),
 })
 
 export type UserResponse = z.infer<typeof UserResponseSchema>

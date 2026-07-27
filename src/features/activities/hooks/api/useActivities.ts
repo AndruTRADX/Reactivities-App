@@ -10,6 +10,7 @@ const withUserContext = <T extends ActivityResponse>(activity: T, userId?: strin
   const host = activity.attendees.find(a => a.isHost)
   const hostId = host?.user.id ?? ""
   const hostDisplayName = host?.user.displayName ?? ""
+  const hostImageUrl = host?.user.imageUrl
 
   return {
     ...activity,
@@ -17,6 +18,7 @@ const withUserContext = <T extends ActivityResponse>(activity: T, userId?: strin
     hostDisplayName,
     isHost: hostId === userId,
     isGoing: activity.attendees.some(a => a.user.id === userId),
+    hostImageUrl,
   }
 }
 

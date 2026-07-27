@@ -6,7 +6,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 export const useJoinActivity = () => {
   const { user } = useGetCurrentUser()
-  const currentUser = user ?? { id: "", email: "", displayName: "", imageUrl: null }
+  const currentUser = {
+    id: user?.id ?? "",
+    biography: user?.biography ?? "",
+    displayName: user?.displayName ?? "",
+    imageUrl: user?.imageUrl ?? "",
+  }
 
   const { onMutate, onError } = useOptimisticUpdate<ActivityResponse, { id: string }>({
     optimisticQueryKey: ({ id }) => ["activity", id],

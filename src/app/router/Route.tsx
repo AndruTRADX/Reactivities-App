@@ -10,6 +10,7 @@ import NotFoundPage from "@/features/errors/NotFoundPage"
 import LoginPage from "@/features/account/LoginPage"
 import RequireAuth from "./RequireAuth"
 import RegisterPage from "@/features/account/RegisterPage"
+import ProfilePage from "@/features/profile/ProfilePage"
 
 export const router = createBrowserRouter([
   {
@@ -46,6 +47,10 @@ export const router = createBrowserRouter([
           {
             path: "update-activity/:id",
             element: <UpdateActivityPage />,
+          },
+          {
+            path: "profile/:id",
+            element: <ProfilePage />,
           },
         ],
       },

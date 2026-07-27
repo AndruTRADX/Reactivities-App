@@ -29,6 +29,7 @@ import { ErrorShow } from "@/shared/components/common/ErrorShow"
 import type { ActivityResponse } from "@activities/schemas/response/ActivityResponse"
 import { useConfirmDialog } from "@sharedHooks/useConfirmDialog"
 import { useJoinActivity, useLeaveActivity } from "@activities/hooks/api/useAttendees"
+import { defaultImage64 } from "@/shared/constants/defaultImage"
 
 const getActivityStatusBadges = (activity: ActivityResponse) =>
   [
@@ -262,10 +263,10 @@ export default function ActivityDetailsPage() {
               <div key={attendee.user.id} className="flex gap-3 items-center my-2">
                 <Avatar size="lg">
                   <AvatarImage
-                    src="https://github.com/shadcn.png"
+                    src={attendee.user.imageUrl ?? defaultImage64}
                     alt={attendee.user.displayName}
                   />
-                  <AvatarFallback>CN</AvatarFallback>
+                  <AvatarFallback>{attendee.user.displayName}</AvatarFallback>
                 </Avatar>
                 <div className="flex w-full justify-between items-center">
                   <h3 className="text-foreground font-semibold text-base">
