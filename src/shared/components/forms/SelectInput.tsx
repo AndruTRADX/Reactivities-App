@@ -39,7 +39,7 @@ export function SelectInput<T extends FieldValues>({
     if (selected) {
       field.onChange(selected.value)
     } else {
-      field.onChange("") // or whatever default, maybe empty string
+      field.onChange("")
     }
   }
 

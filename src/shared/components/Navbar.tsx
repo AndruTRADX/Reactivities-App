@@ -141,7 +141,7 @@ export default function Navbar() {
             <DropdownMenuContent className="w-40" align="end">
               <DropdownMenuGroup>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate(`/profile/${user.id}`)}>
                   {user.imageUrl ? (
                     <Avatar size="sm">
                       <AvatarImage src={user.imageUrl} alt={user.displayName} />

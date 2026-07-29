@@ -49,9 +49,6 @@ export default function LocationInput<T extends FieldValues>({
     }
     setLoading(true)
     try {
-      // agent.ts's axios module augmentation is global, so TS thinks this returns
-      // LocationIQSuggestion[] directly — but this plain `axios` import has no
-      // response interceptor to unwrap it, so it's really an AxiosResponse at runtime.
       const res = (await axios.get(locationIqUrl(q))) as unknown as { data: LocationIQSuggestion[] }
       setSuggestions(Array.isArray(res.data) ? res.data : [])
     } catch {

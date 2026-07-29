@@ -1,11 +1,12 @@
 import type { ActivityResponse } from "@/features/activities/schemas/response/ActivityResponse"
-import { useGetCurrentUser } from "@sharedHooks/api/useAccount"
+import type { UserResponse } from "@sharedSchemas/response/UserResponse"
 import { useOptimisticUpdate } from "@sharedHooks/useOptimisticUpdate"
 import agent from "@/shared/services/agent"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 export const useJoinActivity = () => {
-  const { user } = useGetCurrentUser()
+  const queryClient = useQueryClient()
+  const user = queryClient.getQueryData<UserResponse>(["user"])
   const currentUser = {
     id: user?.id ?? "",
     biography: user?.biography ?? "",
@@ -54,7 +55,7 @@ export const useJoinActivity = () => {
 
 export const useLeaveActivity = () => {
   const queryClient = useQueryClient()
-  const { user } = useGetCurrentUser()
+  const user = queryClient.getQueryData<UserResponse>(["user"])
 
   const { onMutate, onError } = useOptimisticUpdate<ActivityResponse, { id: string }>({
     optimisticQueryKey: ({ id }) => ["activity", id],

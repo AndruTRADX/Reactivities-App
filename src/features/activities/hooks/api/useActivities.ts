@@ -4,7 +4,7 @@ import type { ActivitySpecificationParams } from "@activities/schemas/request/Ac
 import agent from "@/shared/services/agent"
 import type { ActivityResponse } from "@activities/schemas/response/ActivityResponse"
 import type { CancelActivityRequest } from "@activities/schemas/request/CancelActivityRequest"
-import { useGetCurrentUser } from "@sharedHooks/api/useAccount"
+import type { UserResponse } from "@sharedSchemas/response/UserResponse"
 
 const withUserContext = <T extends ActivityResponse>(activity: T, userId?: string) => {
   const host = activity.attendees.find(a => a.isHost)
@@ -23,16 +23,16 @@ const withUserContext = <T extends ActivityResponse>(activity: T, userId?: strin
 }
 
 export const useGetActivities = (params: ActivitySpecificationParams) => {
-  const { user } = useGetCurrentUser()
+  const queryClient = useQueryClient()
 
   const { data, isLoading, error } = useQuery<PagedResponse<ActivityResponse>>({
     queryKey: ["activities", params],
     queryFn: () => agent.get<PagedResponse<ActivityResponse>>("/activities", { params }),
     placeholderData: keepPreviousData,
-    select: data => ({
-      ...data,
-      data: data.data.map(activity => withUserContext(activity, user?.id)),
-    }),
+    select: data => {
+      const userId = queryClient.getQueryData<UserResponse>(["user"])?.id
+      return { ...data, data: data.data.map(activity => withUserContext(activity, userId)) }
+    },
   })
 
   return {
@@ -43,13 +43,13 @@ export const useGetActivities = (params: ActivitySpecificationParams) => {
 }
 
 export const useGetActivityById = (id: string | undefined) => {
-  const { user } = useGetCurrentUser()
+  const queryClient = useQueryClient()
 
   const { data, isLoading, error } = useQuery<ActivityResponse>({
     queryKey: ["activity", id],
     queryFn: () => agent.get<ActivityResponse>(`/activities/${id}`),
     enabled: !!id,
-    select: data => withUserContext(data, user?.id),
+    select: data => withUserContext(data, queryClient.getQueryData<UserResponse>(["user"])?.id),
   })
 
   return {

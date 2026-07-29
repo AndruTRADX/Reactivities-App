@@ -147,7 +147,90 @@ It's not applied per-page — it's one route entry that owns a `children` array,
 
 1. **Decide where it belongs.** Is this the feature's first/primary page, or an additional one alongside an existing primary page? Primary → `src/features/<feature>/EntityPage.tsx`. Additional → `src/features/<feature>/pages/<action>/<Name>Page.tsx`.
 2. **Write the component** — default export, named to match the file exactly.
-3. **If it fetches data on mount**, add a colocated `Skeleton<Purpose>` component in that page's `components/` folder and wire it as the first early return — see [loading-states.md](./loading-states.md) for the full rule.
+3. **If it fetches data on mount**, it needs all three of: a colocated `Skeleton<Purpose>` component, an `ErrorShow`, and a `NoContent` guard — see [Anatomy of a data-fetching page](#anatomy-of-a-data-fetching-page) below. This isn't optional per-page; a details/list page that skips the error or empty guard is incomplete.
 4. **If it's a form page**, reuse `FormWrapper` (`src/shared/components/common/FormWrapper.tsx`) for the centered single-card layout and a form component from the feature's `forms/` folder for the fields — see [forms.md](./forms.md) for building the form itself.
 5. **Register the route** in `src/app/router/Route.tsx` — import the page, add it to the correct `children` array (public vs. behind `RequireAuth`) as described above.
 6. **Link to it** — add a `<Link to="...">` (or `navigate(...)`) wherever a user should be able to reach the new page. A page with no route linking to it is unreachable but won't fail any build or type check, so this step is easy to forget.
+
+---
+
+## Anatomy of a data-fetching page
+
+Any page whose first render depends on a `useGetX`/`useGetXs` hook is a small state machine with four states, checked as early returns **in this exact order**, before the real content:
+
+1. **Loading** → a colocated `Skeleton<Purpose>` — see [loading-states.md](./loading-states.md) for how to build and place one.
+2. **Error** → `<ErrorShow error={...} />` (`src/shared/components/common/ErrorShow.tsx`). It reads the Axios error shape produced by `agent.ts` and renders the right title/description/status itself — pass the hook's `error*` value straight through, never build a custom error UI.
+3. **Empty** → `<NoContent title="..." description="..." />` (`src/shared/components/common/NotFound.tsx`) — for a single entity that resolved to nothing (`!entity`) or a list that resolved to zero items (`items.length === 0`). Both props are optional but should always be given a page-specific value on real pages; the defaults exist for the component itself, not as something to lean on.
+4. **Content** — the real page, safe to assume non-null/non-empty data past this point.
+
+Skipping the error guard leaves the page stuck on its skeleton forever if the request 404s/500s (nothing else catches it). Skipping the empty guard either crashes reading a property off `undefined` or silently renders a blank page — both of which `docs/loading-states.md`'s "never a blank page" rule also forbids.
+
+Every page in this app that fetches data follows this shape — a details/single-entity page and a paginated list page differ only in the empty check (`!entity` vs `items.length === 0`):
+
+```tsx
+// src/features/<feature>/pages/details/EntityDetailsPage.tsx
+import { useParams } from "react-router"
+import { useGetEntityById } from "@/features/<feature>/hooks/api/useEntities"
+import { SkeletonPage } from "./components/SkeletonPage"
+import { ErrorShow } from "@/shared/components/common/ErrorShow"
+import { NoContent } from "@/shared/components/common/NotFound"
+
+export default function EntityDetailsPage() {
+  const { id } = useParams()
+  const { entity, isLoadingEntity, errorEntity } = useGetEntityById(id)
+
+  if (isLoadingEntity) {
+    return <SkeletonPage />
+  }
+
+  if (errorEntity) {
+    return <ErrorShow error={errorEntity} />
+  }
+
+  if (!entity) {
+    return (
+      <NoContent
+        title="Entity not found"
+        description={`The entity with the id ${id} has not been found`}
+      />
+    )
+  }
+
+  return <div className="flex flex-col w-full gap-6">{/* real content, built from `entity` */}</div>
+}
+```
+
+```tsx
+// src/features/<feature>/EntityPage.tsx
+import { useGetEntities } from "./hooks/api/useEntities"
+import { SkeletonPage } from "./components/SkeletonPage"
+import { ErrorShow } from "@/shared/components/common/ErrorShow"
+import { NoContent } from "@/shared/components/common/NotFound"
+import { usePagedParams } from "@/shared/hooks/usePagedParams"
+
+export default function EntityPage() {
+  const { pageIndex, pageSize, setPageIndex } = usePagedParams("entities")
+  const { pagedEntities, isLoadingEntities, errorPagedEntities } = useGetEntities({
+    pageIndex,
+    pageSize,
+  })
+
+  const entities = pagedEntities?.data ?? []
+
+  if (isLoadingEntities) {
+    return <SkeletonPage />
+  }
+
+  if (errorPagedEntities) {
+    return <ErrorShow error={errorPagedEntities} />
+  }
+
+  if (entities.length === 0) {
+    return <NoContent title="No entities" description="No entities have been created" />
+  }
+
+  return <div className="grid grid-cols-4 gap-6">{/* real content, built from `entities` */}</div>
+}
+```
+
+See [pagination.md](./pagination.md) for `usePagedParams`/`pagedEntities` details, which are a separate topic from the loading/error/empty shape shown here.
