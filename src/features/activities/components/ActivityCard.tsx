@@ -86,7 +86,7 @@ export default function ActivityCard({ activity }: Props) {
       <CardContent>
         <AvatarGroup>
           {activity.attendees.map(attendee => (
-            <ProfileCard user={attendee.user} />
+            <ProfileCard key={attendee.user.id} user={attendee.user} />
           ))}
         </AvatarGroup>
       </CardContent>

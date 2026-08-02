@@ -38,7 +38,7 @@ export default function Navbar() {
   }, [logoutAccountAsync])
 
   return (
-    <nav className="z-50 fixed w-full flex justify-between px-5.5 py-2.5 bg-primary-foreground/35 backdrop-blur-xl">
+    <nav className="glass z-50 fixed w-full flex justify-between px-5.5 py-2.5 bg-primary-foreground/35 backdrop-blur-xl backdrop-saturate-150 inset-ring-1 inset-ring-glass-highlight/60 dark:inset-ring-glass-highlight/40">
       <NavLink to="/" end>
         {({ isActive }) => (
           <Button

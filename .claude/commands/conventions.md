@@ -12,7 +12,7 @@ Source of truth for `ReactivitiesApp` conventions. Apply these before writing an
 | Forms (React Hook Form, components, skeleton) | [docs/forms.md](../../docs/forms.md) |
 | API hooks (useQuery, useMutation, agent.ts) | [docs/api-hooks.md](../../docs/api-hooks.md) |
 | Pagination (any paginated list, single or nested) | [docs/pagination.md](../../docs/pagination.md) |
-| Theming (colors, dark mode, backdrop-blur) | [docs/theming.md](../../docs/theming.md) |
+| Theming (colors, dark mode, glass surfaces) | [docs/theming.md](../../docs/theming.md) |
 | UI components (shadcn, where new components live) | [docs/ui-components.md](../../docs/ui-components.md) |
 | Loading states (skeletons) | [docs/loading-states.md](../../docs/loading-states.md) |
 | Confirm dialog (global confirmation, useConfirmDialog) | [docs/confirm-dialog.md](../../docs/confirm-dialog.md) |

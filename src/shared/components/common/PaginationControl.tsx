@@ -24,6 +24,12 @@ export function PaginationControl({ pageIndex, pageCount, onPageChange }: Props)
   const isFirstPage = pageIndex <= 1
   const isLastPage = pageIndex >= pageCount
 
+  const goToPage = (page: number) => {
+    if (page === pageIndex) return
+    onPageChange(page)
+    document.querySelector("#reactivities-main-container")?.scrollTo({ top: 0 })
+  }
+
   return (
     <Pagination>
       <PaginationContent>
@@ -34,7 +40,7 @@ export function PaginationControl({ pageIndex, pageCount, onPageChange }: Props)
             className={isFirstPage ? "pointer-events-none opacity-50" : undefined}
             onClick={e => {
               e.preventDefault()
-              if (!isFirstPage) onPageChange(pageIndex - 1)
+              if (!isFirstPage) goToPage(pageIndex - 1)
             }}
           />
         </PaginationItem>
@@ -51,7 +57,7 @@ export function PaginationControl({ pageIndex, pageCount, onPageChange }: Props)
                 isActive={page === pageIndex}
                 onClick={e => {
                   e.preventDefault()
-                  onPageChange(page)
+                  goToPage(page)
                 }}
               >
                 {page}
@@ -67,7 +73,7 @@ export function PaginationControl({ pageIndex, pageCount, onPageChange }: Props)
             className={isLastPage ? "pointer-events-none opacity-50" : undefined}
             onClick={e => {
               e.preventDefault()
-              if (!isLastPage) onPageChange(pageIndex + 1)
+              if (!isLastPage) goToPage(pageIndex + 1)
             }}
           />
         </PaginationItem>

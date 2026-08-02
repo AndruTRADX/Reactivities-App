@@ -1,11 +1,12 @@
-import type { PhotoResponse } from "@/features/profile/schema/PhotoResponse"
+import type { PhotoResponse } from "@/features/profile/schema/response/PhotoResponse"
 import type { PagedRequest } from "@sharedSchemas/request/PagedRequest"
 import type { PagedResponse } from "@sharedSchemas/response/PagedResponse"
 import type { UserProfileResponse } from "@sharedSchemas/response/UserProfileResponse"
 import agent from "@/shared/services/agent"
-import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query"
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useMemo } from "react"
 import type { UserResponse } from "@sharedSchemas/response/UserResponse"
+import type { AddPhotoRequest } from "@profile/schema/request/AddPhotoRequest"
 
 export const useGetProfileById = (id: string | undefined) => {
   const {
@@ -48,5 +49,25 @@ export const useGetProfilePhotosById = (id: string | undefined, params: PagedReq
     isLoadingPagedPhotos,
     errorPagedPhotos,
     isCurrentUser,
+  }
+}
+
+export const useAddPhotoProfile = () => {
+  const queryClient = useQueryClient()
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (request: AddPhotoRequest) => {
+      return await agent.post("/profiles/add-photo", request)
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ["activities"],
+      })
+    },
+  })
+
+  return {
+    addPhotoAsync: mutateAsync,
+    isPendingAddPhoto: isPending,
   }
 }

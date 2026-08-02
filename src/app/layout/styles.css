@@ -49,6 +49,7 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --color-glass-highlight: var(--glass-highlight);
 }
 
 :root {
@@ -87,6 +88,7 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --profile-header-gradient: linear-gradient(135deg, oklch(82% 0.08 262) 0%, oklch(78% 0.11 293) 28%, oklch(80% 0.11 335) 52%, oklch(84% 0.075 35) 78%, oklch(96% 0.02 60) 100%);
+  --glass-highlight: oklch(1 0 0 / 55%);
 }
 
 .dark {
@@ -124,6 +126,7 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
   --profile-header-gradient: linear-gradient(135deg, oklch(34% 0.16 262) 0%, oklch(54.1% 0.281 293.009) 25%, oklch(60% 0.24 335) 52%, oklch(66% 0.16 30) 78%, oklch(0.205 0 0) 100%);
+  --glass-highlight: oklch(1 0 0 / 12%);
 }
 
 @layer base {
@@ -142,5 +145,56 @@
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--muted-foreground);
+  }
+}
+
+@layer components {
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .glass {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(120% 60% at 20% 0%, var(--glass-highlight), transparent 60%);
+    mix-blend-mode: overlay;
+    pointer-events: none;
   }
 }

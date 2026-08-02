@@ -246,6 +246,30 @@ The most complex shared component. It maintains its own local React state for th
 
 The `field.ref` is forwarded to the calendar trigger button so RHF can programmatically focus the field when needed (e.g. when the user submits with an empty date field).
 
+#### `DropZone`
+
+A drag-and-drop file picker. Works in two modes depending on the `multiple` prop:
+
+```tsx
+// Single file — field value is `File | null`
+<DropZone control={form.control} name="avatar" label="Avatar" accept="image/*" />
+
+// Multiple files — field value is `File[]`
+<DropZone control={form.control} name="photos" label="Photos" accept="image/*" multiple />
+```
+
+The corresponding Zod schema drives validation the same way as any other field — `DropZone` itself does not reject or error on file type/size, it only filters which dropped/selected files it hands to `onChange` via `accept`:
+
+```ts
+// Single file
+avatar: z.instanceof(File, { message: "An avatar image is required" }),
+
+// Multiple files
+photos: z.array(z.instanceof(File)).min(1, "At least one photo is required"),
+```
+
+`accept` is forwarded to the native `<input type="file">` (filters the OS file picker) and is also used to filter files dropped via drag-and-drop, since the browser doesn't enforce `accept` on drop events itself. Selected files render as a list below the drop area — an image thumbnail via `URL.createObjectURL` for image files, a generic file icon otherwise — each with its own remove button. `field.onBlur` fires after every add/remove so `mode: "onTouched"` revalidates the same way it would for a blurred text field.
+
 ### Adding a new shared component
 
 If you need an input type that doesn't exist yet, **do not** build it inline in a feature form. Create it in `src/shared/components/forms/` following the same pattern:

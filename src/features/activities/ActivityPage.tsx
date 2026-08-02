@@ -18,8 +18,10 @@ import { PaginationControl } from "@/shared/components/common/PaginationControl"
 import { usePagedParams } from "@/shared/hooks/usePagedParams"
 
 export default function ActivityPage() {
-  const { pageIndex, pageSize, sort, setPageIndex, setSort } =
-    usePagedParams<ActivitySort>("activities")
+  const { pageIndex, pageSize, sort, setPageIndex, setSort } = usePagedParams<ActivitySort>(
+    "activities",
+    6
+  )
 
   const { pagedActivities, isLoadingActivities, errorPagedActivities } = useGetActivities({
     pageIndex,
