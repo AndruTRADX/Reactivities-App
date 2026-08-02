@@ -107,7 +107,7 @@ export const useSetMainPhotoProfile = () => {
 
         return {
           ...data,
-          imageUrl: data.imageUrl ?? photo.url,
+          imageUrl: photo.url,
         }
       })
 
@@ -116,7 +116,7 @@ export const useSetMainPhotoProfile = () => {
 
         return {
           ...data,
-          imageUrl: data.imageUrl ?? photo.url,
+          imageUrl: photo.url,
         }
       })
     },
@@ -125,5 +125,30 @@ export const useSetMainPhotoProfile = () => {
   return {
     setMainPhotoAsync: mutateAsync,
     isPendingSetMainPhoto: isPending,
+  }
+}
+
+export const useDeletePhotoProfile = () => {
+  const queryClient = useQueryClient()
+  const user = queryClient.getQueryData<UserResponse>(["user"])
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (response: PhotoResponse) => {
+      return await agent.delete(`/profiles/${response.id}/photos`)
+    },
+    onSuccess: async () => {
+      queryClient.invalidateQueries({
+        queryKey: ["user"],
+      })
+
+      queryClient.invalidateQueries({
+        queryKey: ["profile", user?.id],
+      })
+    },
+  })
+
+  return {
+    deletePhotoAsync: mutateAsync,
+    isPendingDeletePhoto: isPending,
   }
 }
