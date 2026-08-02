@@ -5,12 +5,16 @@ import { toast } from "sonner"
 import { router } from "@/app/router/Route"
 
 declare module "axios" {
+  export interface AxiosRequestConfig {
+    asFormData?: boolean
+  }
+
   export interface AxiosInstance {
-    get<T = unknown>(url: string, config?: unknown): Promise<T>
-    post<T = unknown>(url: string, data?: unknown, config?: unknown): Promise<T>
-    put<T = unknown>(url: string, data?: unknown, config?: unknown): Promise<T>
-    patch<T = unknown>(url: string, data?: unknown, config?: unknown): Promise<T>
-    delete<T = unknown>(url: string, config?: unknown): Promise<T>
+    get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T>
+    post<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T>
+    put<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T>
+    patch<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T>
+    delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T>
   }
 }
 
@@ -26,6 +30,14 @@ const STATUS_LABELS: Record<number, string> = {
 const agent = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
+})
+
+agent.interceptors.request.use(config => {
+  if (config.asFormData && config.data && !(config.data instanceof FormData)) {
+    config.data = axios.toFormData(config.data)
+  }
+
+  return config
 })
 
 agent.interceptors.response.use(

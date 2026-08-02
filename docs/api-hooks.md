@@ -181,16 +181,49 @@ We override that with a TypeScript module augmentation at the top of `agent.ts`:
 ```ts
 declare module "axios" {
   export interface AxiosInstance {
-    get<T = unknown>(url: string, config?: unknown): Promise<T>
-    post<T = unknown>(url: string, data?: unknown, config?: unknown): Promise<T>
-    put<T = unknown>(url: string, data?: unknown, config?: unknown): Promise<T>
-    patch<T = unknown>(url: string, data?: unknown, config?: unknown): Promise<T>
-    delete<T = unknown>(url: string, config?: unknown): Promise<T>
+    get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T>
+    post<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T>
+    put<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T>
+    patch<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T>
+    delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T>
   }
 }
 ```
 
 This tells TypeScript that our axios instance methods return `Promise<T>` directly. Combined with the response interceptor below, calling `agent.get<EntityResponse>(...)` gives you an `EntityResponse` with zero unwrapping.
+
+### Sending `multipart/form-data` — the `asFormData` config flag
+
+By default, axios serializes `data` as JSON. That breaks the moment a request body contains a `File` (or `Blob`) — `JSON.stringify` can't serialize a `File`, and the backend needs `multipart/form-data` to bind it as `IFormFile` anyway.
+
+Rather than building a `FormData` object by hand at every call site, `agent.ts` augments `AxiosRequestConfig` with an `asFormData` flag and a request interceptor that acts on it:
+
+```ts
+declare module "axios" {
+  export interface AxiosRequestConfig {
+    asFormData?: boolean
+  }
+}
+
+agent.interceptors.request.use(config => {
+  if (config.asFormData && config.data && !(config.data instanceof FormData)) {
+    config.data = axios.toFormData(config.data)
+  }
+  return config
+})
+```
+
+`axios.toFormData` is axios's own built-in serializer — it walks a plain object and appends each field to a `FormData` instance, including `File`/`Blob` values, arrays, and nested objects, so no custom serialization code is needed. We don't set the `Content-Type` header manually either: axios detects that `data` is a `FormData` instance and lets the browser set `multipart/form-data` with the correct boundary itself.
+
+Pass `{ asFormData: true }` as the request config wherever the request body contains a `File`:
+
+```ts
+mutationFn: async (request: CreateItemRequest) => {
+  return await agent.post<ItemResponse>("/items", request, { asFormData: true })
+},
+```
+
+Every other call — anything without a `File` in the body — keeps sending plain JSON exactly as before; `asFormData` only changes behavior when explicitly set to `true`.
 
 ### Response interceptor — unwrapping `ApiResponse<T>`
 

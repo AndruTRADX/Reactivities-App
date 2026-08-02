@@ -29,7 +29,11 @@ const STEP_LABELS: Record<Step, string> = {
   3: "Review your photo before submitting.",
 }
 
-export default function SubmitPhotoForm() {
+interface Props {
+  onSuccess?: () => void
+}
+
+export default function SubmitPhotoForm({ onSuccess }: Props) {
   const { addPhotoAsync, isPendingAddPhoto } = useAddPhotoProfile()
 
   const [step, setStep] = useState<Step>(1)
@@ -106,10 +110,11 @@ export default function SubmitPhotoForm() {
         onSuccess: () => {
           toast.success("Photo updated successfully")
           handleReset()
+          onSuccess?.()
         },
       }
     )
-  }, [croppedFile, addPhotoAsync, handleReset])
+  }, [croppedFile, addPhotoAsync, handleReset, onSuccess])
 
   const isSubmitting = useMemo(() => {
     return isPendingAddPhoto || isSubmittingForm

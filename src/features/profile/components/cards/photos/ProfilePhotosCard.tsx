@@ -10,7 +10,7 @@ import { Button } from "@/shared/components/ui/button"
 import { useState } from "react"
 import { ButtonGroup } from "@/shared/components/ui/button-group"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { Delete, Edit02Icon, Plus } from "@hugeicons/core-free-icons"
+import { Cancel, Delete, Edit02Icon, Plus } from "@hugeicons/core-free-icons"
 import { Separator } from "@/shared/components/ui/separator"
 import SubmitPhotoForm from "@profile/components/forms/SubmitPhotoForm"
 
@@ -59,7 +59,15 @@ export default function ProfilePhotosCard() {
                 variant={editMode ? "destructive" : "default"}
                 onClick={() => setEditMode(prev => !prev)}
               >
-                {editMode ? "Cancel" : "Add photo"}
+                {editMode ? (
+                  <>
+                    <HugeiconsIcon icon={Cancel} /> Cancel
+                  </>
+                ) : (
+                  <>
+                    <HugeiconsIcon icon={Plus} /> Add photo
+                  </>
+                )}
               </Button>
             </div>
           )}
@@ -84,7 +92,15 @@ export default function ProfilePhotosCard() {
               variant={editMode ? "destructive" : "default"}
               onClick={() => setEditMode(prev => !prev)}
             >
-              {editMode ? "Cancel" : "Add photo"}
+              {editMode ? (
+                <>
+                  <HugeiconsIcon icon={Cancel} /> Cancel
+                </>
+              ) : (
+                <>
+                  <HugeiconsIcon icon={Plus} /> Add photo
+                </>
+              )}
             </Button>
           </div>
         )}
@@ -95,7 +111,7 @@ export default function ProfilePhotosCard() {
         {editMode ? (
           <>
             <div>
-              <SubmitPhotoForm />
+              <SubmitPhotoForm onSuccess={() => setEditMode(false)} />
             </div>
           </>
         ) : (

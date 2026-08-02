@@ -54,14 +54,35 @@ export const useGetProfilePhotosById = (id: string | undefined, params: PagedReq
 
 export const useAddPhotoProfile = () => {
   const queryClient = useQueryClient()
+  const user = queryClient.getQueryData<UserResponse>(["user"])
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (request: AddPhotoRequest) => {
-      return await agent.post("/profiles/add-photo", request)
+      return await agent.post<PhotoResponse>("/profiles/add-photo", request, {
+        asFormData: true,
+      })
     },
-    onSuccess: async () => {
+    onSuccess: async (photo: PhotoResponse) => {
       await queryClient.invalidateQueries({
-        queryKey: ["activities"],
+        queryKey: ["profile"],
+      })
+
+      queryClient.setQueryData(["user"], (data: UserResponse) => {
+        if (!data) return data
+
+        return {
+          ...data,
+          imageUrl: data.imageUrl ?? photo.url,
+        }
+      })
+
+      queryClient.setQueryData(["profile", user?.id], (data: UserProfileResponse) => {
+        if (!data) return data
+
+        return {
+          ...data,
+          imageUrl: data.imageUrl ?? photo.url,
+        }
       })
     },
   })
@@ -69,5 +90,40 @@ export const useAddPhotoProfile = () => {
   return {
     addPhotoAsync: mutateAsync,
     isPendingAddPhoto: isPending,
+  }
+}
+
+export const useSetMainPhotoProfile = () => {
+  const queryClient = useQueryClient()
+  const user = queryClient.getQueryData<UserResponse>(["user"])
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (response: PhotoResponse) => {
+      return await agent.put(`/profiles/${response.id}/set-main-photo`)
+    },
+    onSuccess: async (_, photo) => {
+      queryClient.setQueryData(["user"], (data: UserResponse) => {
+        if (!data) return data
+
+        return {
+          ...data,
+          imageUrl: data.imageUrl ?? photo.url,
+        }
+      })
+
+      queryClient.setQueryData(["profile", user?.id], (data: UserProfileResponse) => {
+        if (!data) return data
+
+        return {
+          ...data,
+          imageUrl: data.imageUrl ?? photo.url,
+        }
+      })
+    },
+  })
+
+  return {
+    setMainPhotoAsync: mutateAsync,
+    isPendingSetMainPhoto: isPending,
   }
 }
