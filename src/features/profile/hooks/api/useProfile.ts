@@ -7,6 +7,7 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tansta
 import { useMemo } from "react"
 import type { UserResponse } from "@sharedSchemas/response/UserResponse"
 import type { AddPhotoRequest } from "@profile/schema/request/AddPhotoRequest"
+import type { EditProfileRequest } from "@profile/schema/request/EditProfileRequest"
 
 export const useGetProfileById = (id: string | undefined) => {
   const {
@@ -125,6 +126,34 @@ export const useSetMainPhotoProfile = () => {
   return {
     setMainPhotoAsync: mutateAsync,
     isPendingSetMainPhoto: isPending,
+  }
+}
+
+export const useEditProfile = () => {
+  const queryClient = useQueryClient()
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async (request: EditProfileRequest) => {
+      return await agent.put<UserProfileResponse>("/profiles/edit-profile", request)
+    },
+    onSuccess: async (profile: UserProfileResponse) => {
+      queryClient.setQueryData(["profile", profile.id], profile)
+
+      queryClient.setQueryData(["user"], (data: UserResponse) => {
+        if (!data) return data
+
+        return {
+          ...data,
+          displayName: profile.displayName,
+          biography: profile.biography,
+        }
+      })
+    },
+  })
+
+  return {
+    editProfileAsync: mutateAsync,
+    isPendingEditProfile: isPending,
   }
 }
 

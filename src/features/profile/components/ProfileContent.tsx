@@ -1,7 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@sharedUi/card"
+import { Card, CardHeader, CardTitle } from "@sharedUi/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sharedUi/tabs"
 import type { UserProfileResponse } from "@sharedSchemas/response/UserProfileResponse"
 import ProfilePhotosCard from "@profile/components/cards/photos/ProfilePhotosCard"
+import ProfileAboutCard from "@profile/components/cards/about/ProfileAboutCard"
 
 interface Props {
   profile: UserProfileResponse
@@ -18,14 +19,7 @@ export default function ProfileContent({ profile }: Props) {
         <TabsTrigger value="following">Following</TabsTrigger>
       </TabsList>
       <TabsContent value="about">
-        <Card>
-          <CardHeader>
-            <CardTitle>About Me</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm text-muted-foreground">
-            {profile.biography ?? "Not much to say about me :P"}
-          </CardContent>
-        </Card>
+        <ProfileAboutCard profile={profile} />
       </TabsContent>
       <TabsContent value="photos">
         <ProfilePhotosCard />

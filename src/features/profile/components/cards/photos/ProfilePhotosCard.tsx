@@ -124,11 +124,11 @@ export default function ProfilePhotosCard() {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        variant="outline"
+                        variant="glass-outline"
                         size="icon-sm"
                         onClick={e => e.stopPropagation()}
                         disabled={isPendingSetMainPhoto || isPendingDeletePhoto}
-                        className="absolute top-2 right-2 bg-background/70 backdrop-blur-sm hover:bg-background/90"
+                        className="absolute top-2 right-2"
                       >
                         <HugeiconsIcon icon={MoreVerticalIcon} />
                       </Button>
