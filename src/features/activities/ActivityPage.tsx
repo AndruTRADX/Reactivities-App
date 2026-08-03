@@ -44,8 +44,37 @@ export default function ActivityPage() {
   }
 
   return (
-    <div className="grid grid-cols-4 gap-6">
-      <div className="flex flex-col col-span-3 gap-4">
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="flex flex-wrap items-center gap-4 rounded-2xl bg-card px-4 py-3 ring-1 ring-foreground/10 lg:hidden">
+        <div className="min-w-36 flex-1">
+          <ComboboxSelect
+            value={sort}
+            onValueChange={value => value && setSort(value as ActivitySort)}
+            placeholder="Default"
+            items={activitySortOptions.map(option => ({
+              label: activitySortLabels[option],
+              value: option,
+            }))}
+          />
+        </div>
+
+        <RadioGroup defaultValue="all" className="flex w-fit flex-row flex-wrap gap-3">
+          <div className="flex items-center gap-1.5">
+            <RadioGroupItem value="all" id="r1-mobile" />
+            <Label htmlFor="r1-mobile">All</Label>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <RadioGroupItem value="going" id="r2-mobile" />
+            <Label htmlFor="r2-mobile">Going</Label>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <RadioGroupItem value="hosting" id="r3-mobile" />
+            <Label htmlFor="r3-mobile">Hosting</Label>
+          </div>
+        </RadioGroup>
+      </div>
+
+      <div className="flex flex-col lg:col-span-3 gap-4">
         {activities.map(activity => (
           <ActivityCard activity={activity} key={activity.id} />
         ))}
@@ -55,7 +84,7 @@ export default function ActivityPage() {
           onPageChange={setPageIndex}
         />
       </div>
-      <Card className="col-span-1 h-fit">
+      <Card className="col-span-1 hidden h-fit lg:flex">
         <CardHeader>
           <CardTitle className="flex gap-2 font-semibold items-center">
             <HugeiconsIcon className="text-primary" icon={Filter} strokeWidth={2} size={20} />{" "}

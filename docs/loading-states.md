@@ -65,7 +65,7 @@ export default function EntityListPage() {
 }
 ```
 
-A page that doesn't fetch anything on mount (`HomePage`, `LoginPage`, `CreateEntityPage`) doesn't need a skeleton — this rule only applies when the page's first render depends on a `useQuery` that hasn't resolved yet. If you're adding a page that calls a `useGetX`-style hook, it needs a `Skeleton<Purpose>` component before it ships — and the skeleton is only one of three required guards; see [Anatomy of a data-fetching page](./pages.md#anatomy-of-a-data-fetching-page) for the full loading/error/empty shape every such page follows.
+A page that doesn't fetch anything on mount (`LoginPage`, `CreateEntityPage`) doesn't need a skeleton — this rule only applies when the page's first render depends on a `useQuery` that hasn't resolved yet. If you're adding a page that calls a `useGetX`-style hook, it needs a `Skeleton<Purpose>` component before it ships — and the skeleton is only one of three required guards; see [Anatomy of a data-fetching page](./pages.md#anatomy-of-a-data-fetching-page) for the full loading/error/empty shape every such page follows.
 
 For paginated lists specifically, note that `placeholderData: keepPreviousData` (see [pagination.md](./pagination.md)) keeps the previous page's real content on screen during a page change — the skeleton only covers the *first* load, not subsequent page changes.
 

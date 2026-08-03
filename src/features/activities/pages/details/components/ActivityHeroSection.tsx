@@ -46,14 +46,14 @@ export default function ActivityHeroSection({
         className="absolute inset-0 h-full w-full object-cover"
       />
       <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" />
-      <div className="absolute inset-0 z-40 flex flex-col gap-1 justify-end p-6">
+      <div className="absolute inset-0 z-40 flex flex-col gap-1 justify-end p-4 sm:p-6">
         <CardHeader className="p-0">
           <CardAction className="flex gap-2">
             <Badge variant="outline" className="text-foreground">
               {activity.category}
             </Badge>
           </CardAction>
-          <CardTitle className="font-semibold text-lg flex items-center gap-2 text-white">
+          <CardTitle className="font-semibold text-lg flex flex-wrap items-center gap-2 text-white">
             {activity.title}
             {getActivityStatusBadges(activity).map(([label, className]) => (
               <Badge key={label} variant="default" className={className}>
@@ -71,7 +71,7 @@ export default function ActivityHeroSection({
             {format(activity.date, "d MMM yyyy 'at' h:mma")}
           </CardDescription>
         </CardHeader>
-        <CardFooter className="p-0 gap-2 justify-end">
+        <CardFooter className="p-0 gap-2 flex-wrap justify-end">
           {!isFinished && (
             <>
               {activity.isHost && (

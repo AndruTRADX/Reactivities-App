@@ -97,8 +97,8 @@ export default function ActivityDetailsPage() {
 
   return (
     <>
-      <div className="grid grid-cols-4 gap-4">
-        <Card className="col-span-3 overflow-hidden pt-0">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <Card className="lg:col-span-3 overflow-hidden pt-0">
           <ActivityHeroSection
             activity={activity}
             isFinished={isFinished}

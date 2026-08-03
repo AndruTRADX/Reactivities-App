@@ -94,11 +94,16 @@ export default function LoginForm() {
           </Link>
         </FieldDescription>
       </CardContent>
-      <CardFooter className="flex gap-2 justify-end">
-        <Button type="button" variant="outline" onClick={() => form.reset()}>
+      <CardFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => form.reset()}
+          className="w-full sm:w-auto"
+        >
           Reset
         </Button>
-        <Button type="submit" form="login-form" disabled={isDisabled}>
+        <Button type="submit" form="login-form" disabled={isDisabled} className="w-full sm:w-auto">
           {isSubmitting ? (
             <>
               <Spinner /> Signing in

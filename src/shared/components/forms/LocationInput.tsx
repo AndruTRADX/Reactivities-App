@@ -124,7 +124,7 @@ export default function LocationInput<T extends FieldValues>({
                 onSelect={() => handleSelect(item.place_id)}
               >
                 <HugeiconsIcon icon={MapPin} />
-                {item.display_name}
+                <span className="min-w-0 flex-1">{item.display_name}</span>
               </CommandItem>
             ))}
           </CommandList>

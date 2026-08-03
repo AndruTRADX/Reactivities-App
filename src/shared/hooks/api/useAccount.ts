@@ -33,7 +33,7 @@ export const useLogoutAccount = () => {
       queryClient.removeQueries({
         queryKey: ["activities"],
       })
-      navigate(`/`)
+      navigate(`/login`)
     },
   })
 

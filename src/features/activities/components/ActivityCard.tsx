@@ -39,7 +39,7 @@ export default function ActivityCard({ activity }: Props) {
 
   return (
     <Card className="mx-auto w-full overflow-hidden gap-3" key={activity.id}>
-      <div className="flex px-7 gap-4 items-center">
+      <div className="flex px-4 sm:px-7 gap-4 items-center">
         <Avatar className="w-16 h-16" onClick={() => navigate(`/profile/${activity.hostId}`)}>
           <AvatarImage
             src={activity.hostImageUrl ?? defaultImage64}
@@ -49,9 +49,9 @@ export default function ActivityCard({ activity }: Props) {
         </Avatar>
 
         <div className="w-full">
-          <CardTitle className="font-semibold flex items-center justify-between gap-2">
+          <CardTitle className="font-semibold flex flex-wrap items-center justify-between gap-2">
             {activity.title}
-            <div className="flex gap-1.5 items-center">
+            <div className="flex flex-wrap gap-1.5 items-center">
               {getBadges(activity).map(([label, className, variant]) => (
                 <Badge key={label} variant={variant} className={className}>
                   {label}
@@ -72,8 +72,8 @@ export default function ActivityCard({ activity }: Props) {
         </div>
       </div>
       <CardContent>
-        <div className="flex gap-2 text-muted-foreground">
-          <div className="flex min-w-43 items-center gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 text-muted-foreground">
+          <div className="flex sm:min-w-43 items-center gap-2">
             <HugeiconsIcon icon={Clock} className="text-primary min-w-5" />
             <p>{format(activity.date, "yyyy/MM/dd/ hh:mm:ss")}</p>
           </div>

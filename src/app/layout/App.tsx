@@ -14,7 +14,7 @@ function App() {
         <Toaster richColors />
         <main
           id="reactivities-main-container"
-          className="flex flex-col w-full pt-17 px-5.5 bg-primary-foreground h-dvh overflow-y-auto scroll-fade"
+          className="flex flex-col w-full pt-17 px-4 sm:px-5.5 lg:px-8 bg-primary-foreground h-dvh overflow-y-auto scroll-fade"
         >
           <div className="w-full mx-auto max-w-7xl pt-4 pb-6 flex-1">
             <Outlet />

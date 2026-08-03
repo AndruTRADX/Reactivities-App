@@ -4,8 +4,8 @@ import { Card, CardContent, CardHeader } from "@sharedUi/card"
 export function SkeletonPage() {
   return (
     <div className="flex w-full justify-center">
-      <div className=" w-full grid grid-cols-4 max-w-7xl gap-3 mt-4">
-        <Card className="w-full col-span-3">
+      <div className=" w-full grid grid-cols-1 lg:grid-cols-4 max-w-7xl gap-3 mt-4">
+        <Card className="w-full lg:col-span-3">
           <CardHeader>
             <Skeleton className="aspect-video w-full" />
           </CardHeader>

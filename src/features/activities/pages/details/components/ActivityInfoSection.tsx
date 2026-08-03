@@ -25,16 +25,16 @@ export default function ActivityInfoSection({ activity }: Props) {
           <HugeiconsIcon icon={Calendar} className="text-primary w-6" />
           <p className="w-full">{format(activity.date, "d MMM yyyy 'at' h:mma")}</p>
         </CardDescription>
-        <CardDescription className="flex gap-3 items-start">
+        <CardDescription className="flex flex-wrap gap-3 items-start">
           <HugeiconsIcon icon={Location} className="text-primary w-6" />
-          <p className="w-full">{`${activity.city} - ${activity.venue}`}</p>
+          <p className="w-full sm:w-auto sm:flex-1">{`${activity.city} - ${activity.venue}`}</p>
           <Button onClick={() => setMapOpen(prev => !prev)}>
             {mapOpen ? "Hide map" : "Show map"}
           </Button>
         </CardDescription>
       </CardContent>
       {mapOpen && (
-        <CardContent className="w-full h-100 block z-20">
+        <CardContent className="w-full h-64 sm:h-100 block z-20">
           <MapDisplay position={[activity.latitude, activity.longitude]} venue={activity.venue} />
         </CardContent>
       )}

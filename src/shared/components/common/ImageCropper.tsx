@@ -92,19 +92,22 @@ export default function ImageCropper({ image, onCropComplete }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      <ButtonGroup>
-        {ASPECT_OPTIONS.map(option => (
-          <Button
-            key={option.label}
-            type="button"
-            size="sm"
-            variant={aspect === option.value ? "default" : "outline"}
-            onClick={() => handleAspectChange(option.value)}
-          >
-            {option.label}
-          </Button>
-        ))}
-      </ButtonGroup>
+      <div className="overflow-x-auto">
+        <ButtonGroup>
+          {ASPECT_OPTIONS.map(option => (
+            <Button
+              key={option.label}
+              type="button"
+              size="sm"
+              variant={aspect === option.value ? "default" : "outline"}
+              onClick={() => handleAspectChange(option.value)}
+              className="shrink-0"
+            >
+              {option.label}
+            </Button>
+          ))}
+        </ButtonGroup>
+      </div>
 
       <div className="flex justify-center rounded-lg border border-border bg-muted">
         <ReactCrop

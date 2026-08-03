@@ -1,6 +1,7 @@
 import {
   LaptopIcon,
   LogoutCircle01Icon,
+  Menu01Icon,
   Moon02Icon,
   ServerStack03Icon,
   Sun03Icon,
@@ -24,22 +25,39 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu"
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar"
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/shared/components/ui/sheet"
 
 export default function Navbar() {
   const { user } = useGetCurrentUser()
   const { logoutAccountAsync } = useLogoutAccount()
   const { theme, setTheme } = useTheme()
   const navigate = useNavigate()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const handleLogout = useCallback(async () => {
     await logoutAccountAsync()
   }, [logoutAccountAsync])
 
+  const handleMobileNavigate = useCallback(
+    (to: string) => {
+      setMobileMenuOpen(false)
+      navigate(to)
+    },
+    [navigate]
+  )
+
   return (
-    <nav className="glass z-50 fixed w-full flex justify-between px-5.5 py-2.5 bg-primary-foreground/35 backdrop-blur-xl backdrop-saturate-150 inset-ring-1 inset-ring-glass-highlight/60 dark:inset-ring-glass-highlight/40">
-      <NavLink to="/" end>
+    <nav className="glass z-50 fixed w-full flex justify-between px-4 sm:px-5.5 py-2.5 bg-primary-foreground/35 backdrop-blur-xl backdrop-saturate-150 inset-ring-1 inset-ring-glass-highlight/60 dark:inset-ring-glass-highlight/40">
+      <NavLink to="/activities" end>
         {({ isActive }) => (
           <Button
             size="lg"
@@ -54,7 +72,7 @@ export default function Navbar() {
         )}
       </NavLink>
 
-      <div className="flex gap-2">
+      <div className="hidden md:flex gap-2">
         <NavLink to="/activities" end>
           {({ isActive }) => (
             <Button
@@ -78,7 +96,7 @@ export default function Navbar() {
         </NavLink>
       </div>
 
-      <div className="flex gap-2 items-center">
+      <div className="hidden md:flex gap-2 items-center">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon" className="relative">
@@ -191,6 +209,125 @@ export default function Navbar() {
           </>
         )}
       </div>
+
+      <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+        <SheetTrigger asChild>
+          <Button variant="outline" size="icon" className="md:hidden">
+            <HugeiconsIcon icon={Menu01Icon} strokeWidth={2} />
+            <span className="sr-only">Open menu</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="right" className="gap-0">
+          <SheetHeader>
+            <SheetTitle>Menu</SheetTitle>
+          </SheetHeader>
+
+          <div className="flex flex-col gap-1 px-6">
+            <NavLink to="/activities" end onClick={() => setMobileMenuOpen(false)}>
+              {({ isActive }) => (
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start",
+                    isActive ? "text-primary hover:text-primary/80" : "text-foreground"
+                  )}
+                >
+                  Activities
+                </Button>
+              )}
+            </NavLink>
+
+            <NavLink to="/create-activity" onClick={() => setMobileMenuOpen(false)}>
+              {({ isActive }) => (
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start",
+                    isActive ? "text-primary hover:text-primary/80" : "text-foreground"
+                  )}
+                >
+                  Create Activity
+                </Button>
+              )}
+            </NavLink>
+          </div>
+
+          <DropdownMenuSeparator className="my-2" />
+
+          <div className="flex flex-col gap-1 px-6">
+            <span className="text-sm text-muted-foreground px-2">Theme</span>
+            <div className="flex gap-2">
+              <Button
+                variant={theme === "light" ? "secondary" : "ghost"}
+                size="icon"
+                onClick={() => setTheme("light")}
+              >
+                <HugeiconsIcon icon={Sun03Icon} className="min-w-5" />
+                <span className="sr-only">Light</span>
+              </Button>
+              <Button
+                variant={theme === "dark" ? "secondary" : "ghost"}
+                size="icon"
+                onClick={() => setTheme("dark")}
+              >
+                <HugeiconsIcon icon={Moon02Icon} className="min-w-5" />
+                <span className="sr-only">Dark</span>
+              </Button>
+              <Button
+                variant={theme === "system" ? "secondary" : "ghost"}
+                size="icon"
+                onClick={() => setTheme("system")}
+              >
+                <HugeiconsIcon icon={LaptopIcon} className="min-w-5" />
+                <span className="sr-only">System</span>
+              </Button>
+            </div>
+          </div>
+
+          <DropdownMenuSeparator className="my-2" />
+
+          <div className="flex flex-col gap-2 px-6">
+            {user ? (
+              <>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => handleMobileNavigate(`/profile/${user.id}`)}
+                >
+                  {user.imageUrl && user.imageUrl !== "" ? (
+                    <Avatar size="sm">
+                      <AvatarImage src={user.imageUrl} alt={user.displayName} />
+                      <AvatarFallback>{user.displayName}</AvatarFallback>
+                    </Avatar>
+                  ) : (
+                    <HugeiconsIcon icon={UserCircleIcon} className="text-primary min-w-5" />
+                  )}
+                  {user.displayName}'s Profile
+                </Button>
+                <SheetClose asChild>
+                  <Button variant="outline" className="w-full justify-start" onClick={handleLogout}>
+                    <HugeiconsIcon icon={LogoutCircle01Icon} className="text-destructive min-w-5" />
+                    Log out
+                  </Button>
+                </SheetClose>
+              </>
+            ) : (
+              <>
+                <Button className="w-full" onClick={() => handleMobileNavigate("/login")}>
+                  Sign In
+                </Button>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => handleMobileNavigate("/register")}
+                >
+                  Register
+                </Button>
+              </>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </nav>
   )
 }

@@ -76,8 +76,13 @@ export const router = createBrowserRouter([
     path: "/",
     element: <App />,
     children: [
-      { path: "", element: <HomePage /> },
-      // public routes go here
+      { path: "", element: <Navigate to="/activities" replace /> },
+      {
+        element: <RequireGuest />,
+        children: [
+          // routes only an anonymous visitor should reach (login, register) go here
+        ],
+      },
       {
         element: <RequireAuth />,
         children: [
@@ -94,7 +99,8 @@ To register a new page:
 
 1. Import it at the top — a plain default import, matching the filename (`import CreateEntityPage from "@/features/<feature>/pages/create/CreateEntityPage"`).
 2. Add a `{ path: "...", element: <CreateEntityPage /> }` entry to the right `children` array:
-   - **Public** (no login required) — top-level `children`, alongside `HomePage`/`LoginPage`.
+   - **Public regardless of auth state** (error pages, the catch-all) — top-level `children`, alongside the index redirect.
+   - **Guest-only** (should redirect an already-logged-in visitor away, e.g. login/register) — inside the `RequireGuest` block's `children` — see [Route guards](#route-guards--requireguest) below.
    - **Protected** (login required) — inside the `RequireAuth` block's `children` — see [Route guards](#route-guards--requireauth) below.
 3. Path segments are kebab-case (`create-entity`, `update-entity/:id`) and a detail/update route takes an `:id` param matched by `useParams()` in the page.
 
@@ -137,9 +143,34 @@ It's not applied per-page — it's one route entry that owns a `children` array,
 
 **When *not* to use it:**
 
-- **A public landing/marketing page** (`HomePage`) — the whole point is to be visible to visitors who aren't logged in yet.
-- **The login/register pages themselves** — putting these inside `RequireAuth` creates an infinite redirect loop: an anonymous visitor hits `/login` → `RequireAuth` sees no user → redirects to `/login` → repeat.
+- **The login/register pages themselves** — putting these inside `RequireAuth` creates an infinite redirect loop: an anonymous visitor hits `/login` → `RequireAuth` sees no user → redirects to `/login` → repeat. These use `RequireGuest` instead — see below.
 - **Error pages** (`NotFoundPage`, `ServerErrorPage`, the `*` catch-all) — these must stay reachable regardless of auth state. `agent.ts`'s error interceptor navigates to `/not-found`/`/server-error` directly on 404/500, and that has to work whether or not the user is logged in — gating these behind auth would break error handling itself.
+
+### Route guards — `RequireGuest`
+
+`RequireGuest` (`src/app/router/RequireGuest.tsx`) is `RequireAuth`'s mirror image: it gates routes that only make sense for an anonymous visitor — login and register — and bounces an already-authenticated user away from them instead of letting them land back on a form they have no reason to see:
+
+```tsx
+export default function RequireGuest() {
+  const { user, isLoadingUser } = useGetCurrentUser()
+
+  if (isLoadingUser) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spinner />
+      </div>
+    )
+  }
+
+  if (user) {
+    return <Navigate to="/activities" replace />
+  }
+
+  return <Outlet />
+}
+```
+
+Same three-state shape as `RequireAuth` (loading spinner → redirect → `Outlet`), with the `user` check inverted and no `state={{ from: location }}` — there's no "came from a protected page" concept to preserve when redirecting an already-logged-in visitor away from `/login`.
 
 ---
 
@@ -149,7 +180,7 @@ It's not applied per-page — it's one route entry that owns a `children` array,
 2. **Write the component** — default export, named to match the file exactly.
 3. **If it fetches data on mount**, it needs all three of: a colocated `Skeleton<Purpose>` component, an `ErrorShow`, and a `NoContent` guard — see [Anatomy of a data-fetching page](#anatomy-of-a-data-fetching-page) below. This isn't optional per-page; a details/list page that skips the error or empty guard is incomplete.
 4. **If it's a form page**, reuse `FormWrapper` (`src/shared/components/common/FormWrapper.tsx`) for the centered single-card layout and a form component from the feature's `forms/` folder for the fields — see [forms.md](./forms.md) for building the form itself.
-5. **Register the route** in `src/app/router/Route.tsx` — import the page, add it to the correct `children` array (public vs. behind `RequireAuth`) as described above.
+5. **Register the route** in `src/app/router/Route.tsx` — import the page, add it to the correct `children` array (public vs. behind `RequireGuest` vs. behind `RequireAuth`) as described above.
 6. **Link to it** — add a `<Link to="...">` (or `navigate(...)`) wherever a user should be able to reach the new page. A page with no route linking to it is unreachable but won't fail any build or type check, so this step is easy to forget.
 
 ---
@@ -229,7 +260,13 @@ export default function EntityPage() {
     return <NoContent title="No entities" description="No entities have been created" />
   }
 
-  return <div className="grid grid-cols-4 gap-6">{/* real content, built from `entities` */}</div>
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      {/* real content, built from `entities` — give the primary column
+      `lg:col-span-3` and any sidebar `col-span-1`, so they stack on mobile
+      and sit side by side from `lg:` up */}
+    </div>
+  )
 }
 ```
 

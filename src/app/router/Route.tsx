@@ -1,6 +1,5 @@
-import { createBrowserRouter } from "react-router"
+import { createBrowserRouter, Navigate } from "react-router"
 import App from "@/app/layout/App"
-import HomePage from "@/features/home/HomePage"
 import ActivityPage from "@/features/activities/ActivityPage"
 import CreateActivityPage from "@/features/activities/pages/create/CreateActivityPage"
 import ActivityDetailsPage from "@/features/activities/pages/details/ActivityDetailsPage"
@@ -9,6 +8,7 @@ import ServerErrorPage from "@/features/errors/ServerErrorPage"
 import NotFoundPage from "@/features/errors/NotFoundPage"
 import LoginPage from "@/features/account/LoginPage"
 import RequireAuth from "./RequireAuth"
+import RequireGuest from "./RequireGuest"
 import RegisterPage from "@/features/account/RegisterPage"
 import ProfilePage from "@/features/profile/ProfilePage"
 
@@ -19,15 +19,20 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "",
-        element: <HomePage />,
+        element: <Navigate to="/activities" replace />,
       },
       {
-        path: "login",
-        element: <LoginPage />,
-      },
-      {
-        path: "register",
-        element: <RegisterPage />,
+        element: <RequireGuest />,
+        children: [
+          {
+            path: "login",
+            element: <LoginPage />,
+          },
+          {
+            path: "register",
+            element: <RegisterPage />,
+          },
+        ],
       },
       {
         element: <RequireAuth />,

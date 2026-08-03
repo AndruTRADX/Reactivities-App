@@ -116,7 +116,7 @@ export default function DateInput<T extends FieldValues>({
       {label && <FieldLabel htmlFor={props.name}>{label}</FieldLabel>}
       {description && <FieldDescription>{description}</FieldDescription>}
 
-      <div className={cn("flex gap-2", withTime && "items-center")}>
+      <div className={cn("flex flex-col gap-2 sm:flex-row", withTime && "sm:items-center")}>
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -125,7 +125,7 @@ export default function DateInput<T extends FieldValues>({
               variant={"outline"}
               className={cn(
                 "justify-start text-left font-normal",
-                withTime ? "flex-1" : "w-full",
+                withTime ? "w-full sm:flex-1" : "w-full",
                 !value && "text-muted-foreground"
               )}
             >
@@ -152,7 +152,7 @@ export default function DateInput<T extends FieldValues>({
             step="1"
             value={timeString}
             onChange={handleTimeChange}
-            className="w-36"
+            className="w-full sm:w-36"
           />
         )}
       </div>
