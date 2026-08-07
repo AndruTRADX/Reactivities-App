@@ -41,7 +41,7 @@ export default function TextInput<T extends FieldValues>({
   }
 
   return (
-    <Field className="mb-3">
+    <Field>
       {label && <FieldLabel htmlFor={props.name}>{label}</FieldLabel>}
       {description && <FieldDescription>{description}</FieldDescription>}
 

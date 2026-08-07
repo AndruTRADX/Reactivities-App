@@ -3,17 +3,17 @@ import { useNavigate, useParams } from "react-router"
 import { useCancelActivity, useGetActivityById } from "@activities/hooks/api/useActivities"
 import { SkeletonPage } from "./components/SkeletonPage"
 import { NoContent } from "@/shared/components/common/NotFound"
-import { CancelActivityDialog } from "./components/CancelActivityDialog"
+import { CancelActivityDialog } from "./components/activity/CancelActivityDialog"
 import { toast } from "sonner"
 import { useState, useCallback } from "react"
 import type { CancelActivityRequest } from "@activities/schemas/request/CancelActivityRequest"
 import { ErrorShow } from "@/shared/components/common/ErrorShow"
 import { useConfirmDialog } from "@sharedHooks/useConfirmDialog"
 import { useJoinActivity, useLeaveActivity } from "@activities/hooks/api/useAttendees"
-import ActivityHeroSection from "./components/ActivityHeroSection"
-import ActivityInfoSection from "./components/ActivityInfoSection"
-import ActivityComments from "./components/ActivityComments"
-import ActivityAttendeesCard from "./components/ActivityAttendeesCard"
+import ActivityHeroSection from "./components/activity/ActivityHeroSection"
+import ActivityInfoSection from "./components/activity/ActivityInfoSection"
+import ActivityCommentsSection from "./components/comments/ActivityCommentsSection"
+import ActivityAttendeesCard from "./components/attendees/ActivityAttendeesCard"
 
 export default function ActivityDetailsPage() {
   const { id } = useParams()
@@ -110,7 +110,7 @@ export default function ActivityDetailsPage() {
             isPendingLeaveActivity={isPendingLeaveActivity}
           />
           <ActivityInfoSection activity={activity} />
-          <ActivityComments />
+          <ActivityCommentsSection activityId={activity.id} />
         </Card>
 
         <ActivityAttendeesCard attendees={attendees} />

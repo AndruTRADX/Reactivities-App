@@ -16,7 +16,7 @@ export const useGetProfileById = (id: string | undefined) => {
     error: errorProfile,
   } = useQuery<UserProfileResponse>({
     queryKey: ["profile", id],
-    queryFn: () => agent.get<UserProfileResponse>(`/profiles/${id}`),
+    queryFn: () => agent.get<UserProfileResponse>(`/profile/${id}`),
     enabled: !!id,
   })
 
@@ -36,7 +36,7 @@ export const useGetProfilePhotosById = (id: string | undefined, params: PagedReq
     error: errorPagedPhotos,
   } = useQuery<PagedResponse<PhotoResponse>>({
     queryKey: ["profile", id, "photos", params],
-    queryFn: () => agent.get<PagedResponse<PhotoResponse>>(`/profiles/${id}/photos`, { params }),
+    queryFn: () => agent.get<PagedResponse<PhotoResponse>>(`/profile/${id}/photos`, { params }),
     placeholderData: keepPreviousData,
     enabled: !!id,
   })
@@ -59,7 +59,7 @@ export const useAddPhotoProfile = () => {
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (request: AddPhotoRequest) => {
-      return await agent.post<PhotoResponse>("/profiles/add-photo", request, {
+      return await agent.post<PhotoResponse>("/profile/add-photo", request, {
         asFormData: true,
       })
     },
@@ -100,7 +100,7 @@ export const useSetMainPhotoProfile = () => {
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (response: PhotoResponse) => {
-      return await agent.put(`/profiles/${response.id}/set-main-photo`)
+      return await agent.put(`/profile/${response.id}/set-main-photo`)
     },
     onSuccess: async (_, photo) => {
       queryClient.setQueryData(["user"], (data: UserResponse) => {
@@ -134,7 +134,7 @@ export const useEditProfile = () => {
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (request: EditProfileRequest) => {
-      return await agent.put<UserProfileResponse>("/profiles/edit-profile", request)
+      return await agent.put<UserProfileResponse>("/profile/edit-profile", request)
     },
     onSuccess: async (profile: UserProfileResponse) => {
       queryClient.setQueryData(["profile", profile.id], profile)
@@ -163,7 +163,7 @@ export const useDeletePhotoProfile = () => {
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (response: PhotoResponse) => {
-      return await agent.delete(`/profiles/${response.id}/photos`)
+      return await agent.delete(`/profile/${response.id}/photos`)
     },
     onSuccess: async () => {
       queryClient.invalidateQueries({

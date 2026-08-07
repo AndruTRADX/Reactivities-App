@@ -16,7 +16,7 @@ export default function ActivityInfoSection({ activity }: Props) {
 
   return (
     <>
-      <CardContent className="pb-6 flex flex-col gap-6">
+      <CardContent className="flex flex-col gap-6">
         <CardDescription className="flex gap-3 items-center">
           <HugeiconsIcon icon={Info} className="text-primary w-6" />
           <p className="w-full">{activity.description}</p>
@@ -28,16 +28,16 @@ export default function ActivityInfoSection({ activity }: Props) {
         <CardDescription className="flex flex-wrap gap-3 items-start">
           <HugeiconsIcon icon={Location} className="text-primary w-6" />
           <p className="w-full sm:w-auto sm:flex-1">{`${activity.city} - ${activity.venue}`}</p>
-          <Button onClick={() => setMapOpen(prev => !prev)}>
+          <Button variant="outline" onClick={() => setMapOpen(prev => !prev)}>
             {mapOpen ? "Hide map" : "Show map"}
           </Button>
         </CardDescription>
+        {mapOpen && (
+          <CardContent className="w-full h-64 sm:h-100 block z-20">
+            <MapDisplay position={[activity.latitude, activity.longitude]} venue={activity.venue} />
+          </CardContent>
+        )}
       </CardContent>
-      {mapOpen && (
-        <CardContent className="w-full h-64 sm:h-100 block z-20">
-          <MapDisplay position={[activity.latitude, activity.longitude]} venue={activity.venue} />
-        </CardContent>
-      )}
     </>
   )
 }

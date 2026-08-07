@@ -1,6 +1,6 @@
 import { Badge } from "@sharedUi/badge"
 import { Button } from "@sharedUi/button"
-import { CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from "@sharedUi/card"
+import { CardDescription, CardFooter, CardHeader, CardTitle } from "@sharedUi/card"
 import { Link } from "react-router"
 import { format } from "date-fns"
 import type { ActivityResponse } from "@activities/schemas/response/ActivityResponse"
@@ -48,11 +48,6 @@ export default function ActivityHeroSection({
       <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" />
       <div className="absolute inset-0 z-40 flex flex-col gap-1 justify-end p-4 sm:p-6">
         <CardHeader className="p-0">
-          <CardAction className="flex gap-2">
-            <Badge variant="outline" className="text-foreground">
-              {activity.category}
-            </Badge>
-          </CardAction>
           <CardTitle className="font-semibold text-lg flex flex-wrap items-center gap-2 text-white">
             {activity.title}
             {getActivityStatusBadges(activity).map(([label, className]) => (
@@ -64,9 +59,10 @@ export default function ActivityHeroSection({
           <CardDescription className="text-white flex items-center gap-1.5">
             Hosted by
             <Button variant="link" size="icon-xs" asChild>
-              <Link to={`/profiles/${activity.hostId}`}>{activity.hostDisplayName}</Link>
+              <Link to={`/profile/${activity.hostId}`}>{activity.hostDisplayName}</Link>
             </Button>
           </CardDescription>
+          <CardDescription className="text-white">{activity.category}</CardDescription>
           <CardDescription className="text-white">
             {format(activity.date, "d MMM yyyy 'at' h:mma")}
           </CardDescription>

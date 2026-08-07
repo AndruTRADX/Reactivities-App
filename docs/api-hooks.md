@@ -124,7 +124,7 @@ export const useDoEntity = () => {
 - **`optimisticQueryKey` vs `relatedQueryKeysToCancel` — the key distinction of this hook:**
 
   | | `optimisticQueryKey` | `relatedQueryKeysToCancel` |
-  |---|---|---|
+  | --- | --- | --- |
   | Cardinality | Exactly one | Zero or more |
   | Cancelled before mutating | Yes | Yes |
   | Read via `getQueryData` and snapshotted | Yes | No |
@@ -142,7 +142,7 @@ export const useDoEntity = () => {
 ### Naming conventions
 
 | Raw React Query field | Renamed to | Example |
-|---|---|---|
+| --- | --- | --- |
 | `data` (query) | `<noun>` | `entity`, `pagedEntities`, `user` |
 | `isLoading` (query) | `isLoading<Noun>` | `isLoadingEntity` |
 | `error` (query) | `error<Noun>` | `errorEntity` |
@@ -299,7 +299,7 @@ The interceptor strips the `ApiResponse` envelope and returns only `response.dat
 #### HTTP status behavior
 
 | Status | What happens | Why |
-|---|---|---|
+| --- | --- | --- |
 | Network error (no response) | Toast: "Something went wrong: \<message\>" | Can't do anything smarter without a status code |
 | `400` without field errors | Toast with title and message | A general bad request — one message is enough |
 | `400` with field errors | Toast listing every field and its errors | FluentValidation failures — users need to know which fields failed |
@@ -369,7 +369,7 @@ Using an array enables **partial key matching** for invalidation — more on tha
 ### Convention in this project
 
 | Data | Key |
-|---|---|
+| --- | --- |
 | Entity list (paginated) | `["entities", params]` |
 | Entity by id | `["entity", id]` |
 | Current user | `["user"]` |
@@ -420,7 +420,7 @@ Use it when the data should no longer exist in memory at all, not just be refres
 ### `invalidateQueries` vs `removeQueries`
 
 | | `invalidateQueries` | `removeQueries` |
-|---|---|---|
+| --- | --- | --- |
 | What it does | Marks stale, triggers background refetch | Deletes from cache entirely |
 | Data visible while re-fetching | Yes — stale data shows until new data arrives | No — loading state until re-fetch completes |
 | When to use | After mutations — fresh data, brief stale flash is fine | After logout — showing stale user data is a security concern |
