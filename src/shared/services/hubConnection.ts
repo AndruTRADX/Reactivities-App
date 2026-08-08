@@ -14,8 +14,13 @@ export const createHubConnection = (hubPath: string, queryParams: Record<string,
   const query = new URLSearchParams(queryParams).toString()
   const url = `${getHubBaseUrl()}${hubPath}${query ? `?${query}` : ""}`
 
-  return new signalR.HubConnectionBuilder()
+  const builder = new signalR.HubConnectionBuilder()
     .withUrl(url, { withCredentials: true })
     .withAutomaticReconnect()
-    .build()
+
+  if (import.meta.env.DEV) {
+    builder.configureLogging(signalR.LogLevel.Critical)
+  }
+
+  return builder.build()
 }

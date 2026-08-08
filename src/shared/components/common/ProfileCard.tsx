@@ -24,11 +24,7 @@ export function ProfileCard({ user }: Props) {
       </HoverCardTrigger>
       <HoverCardContent className="flex w-50 flex-col gap-2 bg-popover/25 backdrop-blur-sm cursor-pointer">
         <Avatar className="w-full h-full">
-          <AvatarImage
-            src={user.imageUrl ?? defaultImage64}
-            alt="@shadcn"
-            className="rounded-lg"
-          />
+          <AvatarImage src={user.imageUrl ?? defaultImage64} alt="@shadcn" className="rounded-lg" />
           <AvatarFallback>{user.displayName}</AvatarFallback>
         </Avatar>
         <h2 className="font-semibold text-xl">{user.displayName}</h2>

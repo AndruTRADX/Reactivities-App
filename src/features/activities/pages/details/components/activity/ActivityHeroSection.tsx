@@ -90,7 +90,11 @@ export default function ActivityHeroSection({
                 </Button>
               )}
               {activity.isGoing && !activity.isHost && (
-                <Button variant="glass-default" onClick={onLeave} disabled={isPendingLeaveActivity}>
+                <Button
+                  variant="glass-destructive"
+                  onClick={onLeave}
+                  disabled={isPendingLeaveActivity}
+                >
                   Leave activity
                 </Button>
               )}
