@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react"
-import type { HubConnection } from "@microsoft/signalr"
+import { HubConnectionState, type HubConnection } from "@microsoft/signalr"
 import { createHubConnection } from "@/shared/services/hubConnection"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches HubConnection.on's own (...args: any[]) => any signature
@@ -71,4 +71,21 @@ export const useHubConnection = (
   }, [enabled, hubPath, queryParamsKey])
 
   return connectionRef
+}
+
+/**
+ * Invokes a hub method via the ref returned by useHubConnection, raising a
+ * consistent "Not connected" error instead of each caller re-checking
+ * connection state before every `.invoke(...)`.
+ */
+export const invokeHubMethod = <T = void>(
+  connectionRef: ReturnType<typeof useHubConnection>,
+  methodName: string,
+  ...args: unknown[]
+): Promise<T> => {
+  const connection = connectionRef.current
+  if (!connection || connection.state !== HubConnectionState.Connected) {
+    throw new Error("Not connected")
+  }
+  return connection.invoke<T>(methodName, ...args)
 }

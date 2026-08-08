@@ -1,13 +1,13 @@
-import * as signalR from "@microsoft/signalr"
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useRef, useState } from "react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { useHubConnection } from "@sharedHooks/useHubConnection"
-import { useOptimisticUpdate } from "@sharedHooks/useOptimisticUpdate"
+import { useHubConnection, invokeHubMethod } from "@sharedHooks/useHubConnection"
 import type { ActivityCommentResponse } from "@activities/schemas/response/ActivityCommentResponse"
 import type { PagedResponse } from "@sharedSchemas/response/PagedResponse"
 import type { UserResponse } from "@sharedSchemas/response/UserResponse"
 
 const PAGE_SIZE = 5
+const TEMP_ID_PREFIX = "temp-"
 
 type CommentsCache = {
   comments: ActivityCommentResponse[]
@@ -16,8 +16,6 @@ type CommentsCache = {
 }
 
 const emptyCache: CommentsCache = { comments: [], pageIndex: 1, pageCount: 1 }
-
-const commentsQueryKey = (activityId: string) => ["activity", activityId, "comments"]
 
 const mergeComments = (
   existing: ActivityCommentResponse[],
@@ -31,8 +29,6 @@ const showConnectionError = (err: unknown) => {
   const message = err instanceof Error ? err.message : "Something went wrong"
   toast.error(message)
 }
-
-const TEMP_ID_PREFIX = "temp-"
 
 const buildOptimisticComment = (
   body: string,
@@ -54,18 +50,15 @@ const buildOptimisticComment = (
 
 export const useCommentsHub = (activityId: string | undefined) => {
   const queryClient = useQueryClient()
-  const queryKey = commentsQueryKey(activityId ?? "")
+  const [cache, setCacheState] = useState<CommentsCache>(emptyCache)
+  const [isLoadingComments, setIsLoadingComments] = useState(true)
 
-  const { data = emptyCache, isPending: isLoadingComments } = useQuery<CommentsCache>({
-    queryKey,
-    queryFn: () => {
-      throw new Error("Comments are loaded over SignalR, not fetched")
-    },
-    enabled: false,
-  })
-
-  const setComments = (updater: (prev: CommentsCache) => CommentsCache) =>
-    queryClient.setQueryData<CommentsCache>(queryKey, prev => updater(prev ?? emptyCache))
+  const cacheRef = useRef(cache)
+  const setCache = (updater: (prev: CommentsCache) => CommentsCache) => {
+    const next = updater(cacheRef.current)
+    cacheRef.current = next
+    setCacheState(next)
+  }
 
   const connectionRef = useHubConnection(
     "/hubs/comments",
@@ -74,46 +67,50 @@ export const useCommentsHub = (activityId: string | undefined) => {
       enabled: !!activityId,
       handlers: {
         ReceiveComment: (comment: ActivityCommentResponse) =>
-          setComments(prev => ({ ...prev, comments: mergeComments(prev.comments, [comment]) })),
+          setCache(prev => ({ ...prev, comments: mergeComments(prev.comments, [comment]) })),
         CommentDeleted: (commentId: string) =>
-          setComments(prev => ({
+          setCache(prev => ({
             ...prev,
             comments: prev.comments.filter(comment => comment.id !== commentId),
           })),
       },
       onConnected: async connection => {
-        const page = await connection.invoke<PagedResponse<ActivityCommentResponse>>(
-          "LoadComments",
-          activityId,
-          1,
-          PAGE_SIZE
-        )
-        setComments(prev => ({
-          comments: mergeComments(prev.comments, page.data),
-          pageIndex: page.pageIndex,
-          pageCount: page.pageCount,
-        }))
+        try {
+          const page = await connection.invoke<PagedResponse<ActivityCommentResponse>>(
+            "LoadComments",
+            activityId,
+            1,
+            PAGE_SIZE
+          )
+          setCache(prev => ({
+            comments: mergeComments(prev.comments, page.data),
+            pageIndex: page.pageIndex,
+            pageCount: page.pageCount,
+          }))
+        } finally {
+          setIsLoadingComments(false)
+        }
       },
       onError: showConnectionError,
-      onDisconnected: () => queryClient.removeQueries({ queryKey }),
+      onDisconnected: () => {
+        cacheRef.current = emptyCache
+        setCacheState(emptyCache)
+        setIsLoadingComments(true)
+      },
     }
   )
 
   const loadMoreMutation = useMutation({
-    mutationFn: async () => {
-      const connection = connectionRef.current
-      if (!connection || connection.state !== signalR.HubConnectionState.Connected) {
-        throw new Error("Not connected")
-      }
-      return connection.invoke<PagedResponse<ActivityCommentResponse>>(
+    mutationFn: () =>
+      invokeHubMethod<PagedResponse<ActivityCommentResponse>>(
+        connectionRef,
         "LoadComments",
         activityId,
-        data.pageIndex + 1,
+        cache.pageIndex + 1,
         PAGE_SIZE
-      )
-    },
+      ),
     onSuccess: page =>
-      setComments(prev => ({
+      setCache(prev => ({
         comments: mergeComments(prev.comments, page.data),
         pageIndex: page.pageIndex,
         pageCount: page.pageCount,
@@ -121,73 +118,51 @@ export const useCommentsHub = (activityId: string | undefined) => {
     onError: showConnectionError,
   })
 
-  const { onMutate: onSendMutate, onError: onSendError } = useOptimisticUpdate<
-    CommentsCache,
-    string
-  >({
-    optimisticQueryKey: () => queryKey,
-    updater: (cache, body) => {
-      const currentUser = queryClient.getQueryData<UserResponse>(["user"])
-      if (!currentUser || !activityId) return cache
-
-      const optimisticComment = buildOptimisticComment(body, activityId, currentUser)
-      return { ...cache, comments: mergeComments(cache.comments, [optimisticComment]) }
-    },
-  })
-
   const sendCommentMutation = useMutation({
-    mutationFn: async (body: string) => {
-      const connection = connectionRef.current
-      if (!connection || connection.state !== signalR.HubConnectionState.Connected) {
-        throw new Error("Not connected")
-      }
-      await connection.invoke("SendComment", activityId, body)
+    mutationFn: (body: string) => invokeHubMethod(connectionRef, "SendComment", activityId, body),
+    onMutate: (body: string) => {
+      const currentUser = queryClient.getQueryData<UserResponse>(["user"])
+      if (!currentUser || !activityId) return undefined
+
+      const previousCache = cache
+      const optimisticComment = buildOptimisticComment(body, activityId, currentUser)
+      setCache(prev => ({ ...prev, comments: mergeComments(prev.comments, [optimisticComment]) }))
+      return { previousCache, optimisticId: optimisticComment.id }
     },
-    onMutate: onSendMutate,
-    onSuccess: (_data, body) => {
-      setComments(prev => ({
+    onSuccess: (_data, _body, context) => {
+      if (!context?.optimisticId) return
+      setCache(prev => ({
         ...prev,
-        comments: prev.comments.filter(
-          comment => !(comment.id.startsWith(TEMP_ID_PREFIX) && comment.body === body)
-        ),
+        comments: prev.comments.filter(comment => comment.id !== context.optimisticId),
       }))
     },
-    onError: (err, variables, context) => {
-      onSendError(err, variables, context)
+    onError: (err, _body, context) => {
+      if (context?.previousCache) setCache(() => context.previousCache)
       showConnectionError(err)
     },
   })
 
-  const { onMutate: onDeleteMutate, onError: onDeleteError } = useOptimisticUpdate<
-    CommentsCache,
-    string
-  >({
-    optimisticQueryKey: () => queryKey,
-    updater: (cache, commentId) => ({
-      ...cache,
-      comments: cache.comments.filter(comment => comment.id !== commentId),
-    }),
-  })
-
   const deleteCommentMutation = useMutation({
-    mutationFn: async (commentId: string) => {
-      const connection = connectionRef.current
-      if (!connection || connection.state !== signalR.HubConnectionState.Connected) {
-        throw new Error("Not connected")
-      }
-      await connection.invoke("DeleteComment", activityId, commentId)
+    mutationFn: (commentId: string) =>
+      invokeHubMethod(connectionRef, "DeleteComment", activityId, commentId),
+    onMutate: (commentId: string) => {
+      const previousCache = cache
+      setCache(prev => ({
+        ...prev,
+        comments: prev.comments.filter(comment => comment.id !== commentId),
+      }))
+      return { previousCache }
     },
-    onMutate: onDeleteMutate,
-    onError: (err, variables, context) => {
-      onDeleteError(err, variables, context)
+    onError: (err, _commentId, context) => {
+      if (context?.previousCache) setCache(() => context.previousCache)
       showConnectionError(err)
     },
   })
 
   return {
-    comments: data.comments,
+    comments: cache.comments,
     isLoadingComments,
-    hasMoreComments: data.pageIndex < data.pageCount,
+    hasMoreComments: cache.pageIndex < cache.pageCount,
     loadMoreComments: loadMoreMutation.mutateAsync,
     sendCommentAsync: sendCommentMutation.mutateAsync,
     isPendingSendComment: sendCommentMutation.isPending,
