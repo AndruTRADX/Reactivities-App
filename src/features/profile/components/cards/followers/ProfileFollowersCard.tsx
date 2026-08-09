@@ -5,7 +5,7 @@ import { PaginationControl } from "@/shared/components/common/PaginationControl"
 import { usePagedParams } from "@/shared/hooks/usePagedParams"
 import { Card, CardContent, CardHeader, CardTitle } from "@sharedUi/card"
 import { Separator } from "@sharedUi/separator"
-import { useGetPagedFollowers } from "@profile/hooks/api/useFollows"
+import { useGetPagedFollowers } from "@profile/hooks/api/useProfile"
 import { FollowUserRow } from "@profile/components/FollowUserRow"
 import { SkeletonFollowersCard } from "./SkeletonFollowersCard"
 

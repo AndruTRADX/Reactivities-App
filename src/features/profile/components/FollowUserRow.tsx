@@ -6,7 +6,7 @@ import { Button } from "@sharedUi/button"
 import { defaultImage64 } from "@/shared/constants/defaultImage"
 import type { UserProfileResponse } from "@sharedSchemas/response/UserProfileResponse"
 import type { UserResponse } from "@sharedSchemas/response/UserResponse"
-import { useFollowProfile, useUnfollowProfile } from "@profile/hooks/api/useFollows"
+import { useFollowProfile, useUnfollowProfile } from "@profile/hooks/api/useProfile"
 
 interface Props {
   user: UserProfileResponse

@@ -8,6 +8,7 @@ import { useMemo } from "react"
 import type { UserResponse } from "@sharedSchemas/response/UserResponse"
 import type { AddPhotoRequest } from "@profile/schema/request/AddPhotoRequest"
 import type { EditProfileRequest } from "@profile/schema/request/EditProfileRequest"
+import { useOptimisticUpdate } from "@sharedHooks/useOptimisticUpdate"
 
 export const useGetProfileById = (id: string | undefined) => {
   const {
@@ -179,5 +180,122 @@ export const useDeletePhotoProfile = () => {
   return {
     deletePhotoAsync: mutateAsync,
     isPendingDeletePhoto: isPending,
+  }
+}
+
+const showsFollowState = (queryKey: readonly unknown[]) =>
+  (queryKey[0] === "profile" && (queryKey[2] === "followers" || queryKey[2] === "following")) ||
+  queryKey[0] === "activity" ||
+  queryKey[0] === "activities"
+
+export const useFollowProfile = () => {
+  const queryClient = useQueryClient()
+  const currentUserId = queryClient.getQueryData<UserResponse>(["user"])?.id
+
+  const { onMutate, onError } = useOptimisticUpdate<UserProfileResponse, { targetUserId: string }>({
+    optimisticQueryKey: ({ targetUserId }) => ["profile", targetUserId],
+    updater: profile => ({
+      ...profile,
+      following: true,
+      followersCount: profile.followersCount + 1,
+    }),
+  })
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async ({ targetUserId }: { targetUserId: string }) => {
+      return await agent.post(`/profile/${targetUserId}/follow`)
+    },
+    onMutate,
+    onError,
+    onSuccess: async (_data, { targetUserId }) => {
+      await queryClient.invalidateQueries({ queryKey: ["profile", targetUserId] })
+      await queryClient.invalidateQueries({ queryKey: ["profile", currentUserId] })
+      await queryClient.invalidateQueries({
+        predicate: query => showsFollowState(query.queryKey),
+      })
+    },
+  })
+
+  return {
+    followProfileAsync: mutateAsync,
+    isPendingFollowProfile: isPending,
+  }
+}
+
+export const useUnfollowProfile = () => {
+  const queryClient = useQueryClient()
+  const currentUserId = queryClient.getQueryData<UserResponse>(["user"])?.id
+
+  const { onMutate, onError } = useOptimisticUpdate<UserProfileResponse, { targetUserId: string }>({
+    optimisticQueryKey: ({ targetUserId }) => ["profile", targetUserId],
+    updater: profile => ({
+      ...profile,
+      following: false,
+      followersCount: Math.max(0, profile.followersCount - 1),
+    }),
+  })
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: async ({ targetUserId }: { targetUserId: string }) => {
+      return await agent.delete(`/profile/${targetUserId}/follow`)
+    },
+    onMutate,
+    onError,
+    onSuccess: async (_data, { targetUserId }) => {
+      await queryClient.invalidateQueries({ queryKey: ["profile", targetUserId] })
+      await queryClient.invalidateQueries({ queryKey: ["profile", currentUserId] })
+      await queryClient.invalidateQueries({
+        predicate: query => showsFollowState(query.queryKey),
+      })
+    },
+  })
+
+  return {
+    unfollowProfileAsync: mutateAsync,
+    isPendingUnfollowProfile: isPending,
+  }
+}
+
+export const useGetPagedFollowers = (profileId: string | undefined, params: PagedRequest) => {
+  const {
+    data: pagedFollowers,
+    isLoading: isLoadingPagedFollowers,
+    error: errorPagedFollowers,
+  } = useQuery<PagedResponse<UserProfileResponse>>({
+    queryKey: ["profile", profileId, "followers", params],
+    queryFn: () =>
+      agent.get<PagedResponse<UserProfileResponse>>(`/profile/${profileId}/followers`, {
+        params,
+      }),
+    placeholderData: keepPreviousData,
+    enabled: !!profileId,
+  })
+
+  return {
+    pagedFollowers,
+    isLoadingPagedFollowers,
+    errorPagedFollowers,
+  }
+}
+
+export const useGetPagedFollowing = (profileId: string | undefined, params: PagedRequest) => {
+  const {
+    data: pagedFollowing,
+    isLoading: isLoadingPagedFollowing,
+    error: errorPagedFollowing,
+  } = useQuery<PagedResponse<UserProfileResponse>>({
+    queryKey: ["profile", profileId, "following", params],
+    queryFn: () =>
+      agent.get<PagedResponse<UserProfileResponse>>(`/profile/${profileId}/following`, {
+        params,
+      }),
+    placeholderData: keepPreviousData,
+    enabled: !!profileId,
+  })
+
+  return {
+    pagedFollowing,
+    isLoadingPagedFollowing,
+    errorPagedFollowing,
   }
 }
