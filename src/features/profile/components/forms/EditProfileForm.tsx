@@ -11,6 +11,7 @@ import {
   type EditProfileRequest,
 } from "@profile/schema/request/EditProfileRequest"
 import { useEditProfile } from "@profile/hooks/api/useProfile"
+import { FieldGroup } from "@/shared/components/ui/field"
 
 interface Props {
   profile: UserProfileResponse
@@ -52,26 +53,25 @@ export default function EditProfileForm({ profile, onSuccess, onCancel }: Props)
   )
 
   return (
-    <form
-      id="edit-profile-form"
-      onSubmit={form.handleSubmit(onSubmit)}
-      className="flex flex-col gap-2"
-    >
-      <TextInput
-        control={form.control}
-        name="displayName"
-        label="Display name"
-        placeholder="Display name"
-      />
-      <TextInput
-        control={form.control}
-        name="biography"
-        label="Biography"
-        multiline
-        rows={4}
-        placeholder="Tell us about yourself"
-      />
-      <div className="flex gap-2 justify-end">
+    <form id="edit-profile-form" onSubmit={form.handleSubmit(onSubmit)}>
+      <FieldGroup>
+        <TextInput
+          control={form.control}
+          name="displayName"
+          label="Display name"
+          placeholder="Display name"
+        />
+        <TextInput
+          control={form.control}
+          name="biography"
+          label="Biography"
+          multiline
+          rows={4}
+          placeholder="Tell us about yourself"
+        />
+      </FieldGroup>
+
+      <div className="flex gap-2 justify-end mt-6">
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>

@@ -45,6 +45,10 @@ const buildOptimisticComment = (
     displayName: currentUser.displayName,
     imageUrl: currentUser.imageUrl,
     biography: currentUser.biography ?? "",
+    following: false,
+    followedBy: false,
+    followersCount: 0,
+    followingsCount: 0,
   },
 })
 

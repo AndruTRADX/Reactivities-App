@@ -3,6 +3,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sharedUi/tabs"
 import type { UserProfileResponse } from "@sharedSchemas/response/UserProfileResponse"
 import ProfilePhotosCard from "@profile/components/cards/photos/ProfilePhotosCard"
 import ProfileAboutCard from "@profile/components/cards/about/ProfileAboutCard"
+import ProfileFollowersCard from "@profile/components/cards/followers/ProfileFollowersCard"
+import ProfileFollowingCard from "@profile/components/cards/following/ProfileFollowingCard"
 import { useMediaQuery } from "@/shared/hooks/useMediaQuery"
 
 interface Props {
@@ -38,18 +40,10 @@ export default function ProfileContent({ profile }: Props) {
         </Card>
       </TabsContent>
       <TabsContent value="followers">
-        <Card>
-          <CardHeader>
-            <CardTitle>Followers</CardTitle>
-          </CardHeader>
-        </Card>
+        <ProfileFollowersCard />
       </TabsContent>
       <TabsContent value="following">
-        <Card>
-          <CardHeader>
-            <CardTitle>Following</CardTitle>
-          </CardHeader>
-        </Card>
+        <ProfileFollowingCard />
       </TabsContent>
     </Tabs>
   )

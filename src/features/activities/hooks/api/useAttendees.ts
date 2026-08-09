@@ -12,6 +12,10 @@ export const useJoinActivity = () => {
     biography: user?.biography ?? "",
     displayName: user?.displayName ?? "",
     imageUrl: user?.imageUrl ?? "",
+    following: false,
+    followedBy: false,
+    followersCount: 0,
+    followingsCount: 0,
   }
 
   const { onMutate, onError } = useOptimisticUpdate<ActivityResponse, { id: string }>({
