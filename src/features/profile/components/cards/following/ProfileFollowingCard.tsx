@@ -37,10 +37,7 @@ export default function ProfileFollowingCard() {
         <Separator />
 
         {following.length === 0 ? (
-          <NoContent
-            title="Not following anyone"
-            description="This user isn't following anyone yet"
-          />
+          <NoContent title="Not following anyone" description="Not following anyone yet" />
         ) : (
           <div className="flex flex-col gap-4">
             {following.map(followee => (

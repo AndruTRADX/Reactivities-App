@@ -37,7 +37,7 @@ export default function ProfileFollowersCard() {
         <Separator />
 
         {followers.length === 0 ? (
-          <NoContent title="No followers" description="This user has no followers yet" />
+          <NoContent title="No followers" description="No followers yet" />
         ) : (
           <div className="flex flex-col gap-4">
             {followers.map(follower => (
