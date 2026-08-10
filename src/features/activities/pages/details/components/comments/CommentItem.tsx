@@ -21,8 +21,16 @@ interface Props {
 export default function CommentItem({ comment, isOwnComment, onDelete }: Props) {
   return (
     <div className="flex gap-3 py-4 items-center first:pt-0 last:pb-0">
-      <Avatar size="default">
-        <AvatarImage src={comment.user.imageUrl ?? defaultImage64} alt={comment.user.displayName} />
+      <Avatar size="lg">
+        <AvatarImage
+          src={
+            comment?.user?.imageUrl?.replace(
+              "/upload/",
+              "/upload/w_30,h_30,c_fill,f_auto,dpr_2/"
+            ) ?? defaultImage64
+          }
+          alt={comment.user.displayName}
+        />
         <AvatarFallback>{comment.user.displayName}</AvatarFallback>
       </Avatar>
       <div className="min-w-0 flex-1">

@@ -38,7 +38,12 @@ export default function ProfileHeader({ profile }: Props) {
           <div className="glass w-fit p-3.25 -translate-y-8 rounded-2xl bg-background/40 backdrop-blur-lg backdrop-saturate-150 inset-ring-1 inset-ring-glass-highlight/60 dark:inset-ring-glass-highlight/40">
             <Avatar className="w-32 h-32 sm:w-40 sm:h-40">
               <AvatarImage
-                src={profile.imageUrl ?? defaultImage64}
+                src={
+                  profile?.imageUrl?.replace(
+                    "/upload/",
+                    "/upload/w_280,h_280,c_fill,f_auto,dpr_2/"
+                  ) ?? defaultImage64
+                }
                 alt={profile.displayName}
                 className="rounded-xl"
               />

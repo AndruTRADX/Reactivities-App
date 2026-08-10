@@ -8,7 +8,7 @@ import {
   UserCircleIcon,
   UserSearch,
 } from "@hugeicons/core-free-icons"
-import { HugeiconsIcon } from "@hugeicons/react"
+import { HugeiconsIcon, type HugeiconsIconProps } from "@hugeicons/react"
 import { Button } from "@sharedUi/button"
 import { NavLink, useNavigate } from "react-router"
 import { cn } from "@/shared/lib/utils"
@@ -36,6 +36,66 @@ import {
   SheetTrigger,
 } from "@/shared/components/ui/sheet"
 
+type Theme = "light" | "dark" | "system"
+
+type NavItem = { to: string; label: string; end?: boolean }
+
+const NAV_ITEMS: NavItem[] = [
+  { to: "/activities", label: "Activities", end: true },
+  { to: "/create-activity", label: "Create Activity" },
+]
+
+const THEME_OPTIONS: { value: Theme; label: string; icon: HugeiconsIconProps["icon"] }[] = [
+  { value: "light", label: "Light", icon: Sun03Icon },
+  { value: "dark", label: "Dark", icon: Moon02Icon },
+  { value: "system", label: "System", icon: LaptopIcon },
+]
+
+const GITHUB_LINKS = [
+  { href: "https://github.com/AndruTRADX/Reactivities-App", label: "Client", icon: LaptopIcon },
+  { href: "https://github.com/AndruTRADX/Reactivities-Api", label: "API", icon: ServerStack03Icon },
+]
+
+function NavItemLink({
+  item,
+  mobile,
+  onNavigate,
+}: {
+  item: NavItem
+  mobile?: boolean
+  onNavigate?: () => void
+}) {
+  return (
+    <NavLink to={item.to} end={item.end} onClick={onNavigate}>
+      {({ isActive }) => (
+        <Button
+          variant="ghost"
+          className={cn(
+            mobile && "w-full justify-start",
+            isActive ? "text-primary hover:text-primary/80" : "text-foreground"
+          )}
+        >
+          {item.label}
+        </Button>
+      )}
+    </NavLink>
+  )
+}
+
+function UserAvatar({ imageUrl, displayName }: { imageUrl?: string | null; displayName: string }) {
+  if (!imageUrl) return <HugeiconsIcon icon={UserCircleIcon} className="text-primary min-w-5" />
+
+  return (
+    <Avatar size="sm">
+      <AvatarImage
+        src={imageUrl.replace("/upload/", "/upload/w_30,h_30,c_fill,f_auto,dpr_2/")}
+        alt={displayName}
+      />
+      <AvatarFallback>{displayName}</AvatarFallback>
+    </Avatar>
+  )
+}
+
 export default function Navbar() {
   const { user } = useGetCurrentUser()
   const { logoutAccountAsync } = useLogoutAccount()
@@ -55,6 +115,8 @@ export default function Navbar() {
     [navigate]
   )
 
+  const closeMobileMenu = useCallback(() => setMobileMenuOpen(false), [])
+
   return (
     <nav className="glass z-50 fixed w-full flex justify-between px-4 sm:px-5.5 py-2.5 bg-primary-foreground/35 backdrop-blur-xl backdrop-saturate-150 inset-ring-1 inset-ring-glass-highlight/60 dark:inset-ring-glass-highlight/40">
       <NavLink to="/activities" end>
@@ -73,27 +135,9 @@ export default function Navbar() {
       </NavLink>
 
       <div className="hidden md:flex gap-2">
-        <NavLink to="/activities" end>
-          {({ isActive }) => (
-            <Button
-              variant="ghost"
-              className={cn(isActive ? "text-primary hover:text-primary/80" : "text-foreground")}
-            >
-              Activities
-            </Button>
-          )}
-        </NavLink>
-
-        <NavLink to="/create-activity">
-          {({ isActive }) => (
-            <Button
-              variant="ghost"
-              className={cn(isActive ? "text-primary hover:text-primary/80" : "text-foreground")}
-            >
-              Create Activity
-            </Button>
-          )}
-        </NavLink>
+        {NAV_ITEMS.map(item => (
+          <NavItemLink key={item.to} item={item} />
+        ))}
       </div>
 
       <div className="hidden md:flex gap-2 items-center">
@@ -112,31 +156,17 @@ export default function Navbar() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuRadioGroup
-              value={theme}
-              onValueChange={value => setTheme(value as "light" | "dark" | "system")}
-            >
-              <DropdownMenuRadioItem
-                value="light"
-                className="data-[state=checked]:text-primary [&_svg]:data-[state=checked]:text-primary"
-              >
-                <HugeiconsIcon icon={Sun03Icon} className="min-w-5" />
-                Light
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem
-                value="dark"
-                className="data-[state=checked]:text-primary [&_svg]:data-[state=checked]:text-primary"
-              >
-                <HugeiconsIcon icon={Moon02Icon} className="min-w-5" />
-                Dark
-              </DropdownMenuRadioItem>
-              <DropdownMenuRadioItem
-                value="system"
-                className="data-[state=checked]:text-primary [&_svg]:data-[state=checked]:text-primary"
-              >
-                <HugeiconsIcon icon={LaptopIcon} className="min-w-5" />
-                System
-              </DropdownMenuRadioItem>
+            <DropdownMenuRadioGroup value={theme} onValueChange={value => setTheme(value as Theme)}>
+              {THEME_OPTIONS.map(({ value, label, icon }) => (
+                <DropdownMenuRadioItem
+                  key={value}
+                  value={value}
+                  className="data-[state=checked]:text-primary [&_svg]:data-[state=checked]:text-primary"
+                >
+                  <HugeiconsIcon icon={icon} className="min-w-5" />
+                  {label}
+                </DropdownMenuRadioItem>
+              ))}
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -145,14 +175,7 @@ export default function Navbar() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
-                {user.imageUrl && user.imageUrl !== "" ? (
-                  <Avatar size="sm">
-                    <AvatarImage src={user.imageUrl} alt={user.displayName} />
-                    <AvatarFallback>{user.displayName}</AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <HugeiconsIcon icon={UserCircleIcon} className="text-primary min-w-5" />
-                )}
+                <UserAvatar imageUrl={user.imageUrl} displayName={user.displayName} />
                 {user.displayName}'s Profile
               </Button>
             </DropdownMenuTrigger>
@@ -160,36 +183,19 @@ export default function Navbar() {
               <DropdownMenuGroup>
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => navigate(`/profile/${user.id}`)}>
-                  {user.imageUrl ? (
-                    <Avatar size="sm">
-                      <AvatarImage src={user.imageUrl} alt={user.displayName} />
-                      <AvatarFallback>{user.displayName}</AvatarFallback>
-                    </Avatar>
-                  ) : (
-                    <HugeiconsIcon icon={UserCircleIcon} className="text-primary min-w-5" />
-                  )}
+                  <UserAvatar imageUrl={user.imageUrl} displayName={user.displayName} />
                   Profile
                 </DropdownMenuItem>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
                 <DropdownMenuLabel>GitHub</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() =>
-                    window.open("https://github.com/AndruTRADX/Reactivities-App", "_blank")
-                  }
-                >
-                  <HugeiconsIcon icon={LaptopIcon} className="min-w-5" />
-                  Client
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() =>
-                    window.open("https://github.com/AndruTRADX/Reactivities-Api", "_blank")
-                  }
-                >
-                  <HugeiconsIcon icon={ServerStack03Icon} className="min-w-5" />
-                  API
-                </DropdownMenuItem>
+                {GITHUB_LINKS.map(({ href, label, icon }) => (
+                  <DropdownMenuItem key={href} onClick={() => window.open(href, "_blank")}>
+                    <HugeiconsIcon icon={icon} className="min-w-5" />
+                    {label}
+                  </DropdownMenuItem>
+                ))}
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
               <DropdownMenuGroup>
@@ -223,33 +229,9 @@ export default function Navbar() {
           </SheetHeader>
 
           <div className="flex flex-col gap-1 px-6">
-            <NavLink to="/activities" end onClick={() => setMobileMenuOpen(false)}>
-              {({ isActive }) => (
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start",
-                    isActive ? "text-primary hover:text-primary/80" : "text-foreground"
-                  )}
-                >
-                  Activities
-                </Button>
-              )}
-            </NavLink>
-
-            <NavLink to="/create-activity" onClick={() => setMobileMenuOpen(false)}>
-              {({ isActive }) => (
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start",
-                    isActive ? "text-primary hover:text-primary/80" : "text-foreground"
-                  )}
-                >
-                  Create Activity
-                </Button>
-              )}
-            </NavLink>
+            {NAV_ITEMS.map(item => (
+              <NavItemLink key={item.to} item={item} mobile onNavigate={closeMobileMenu} />
+            ))}
           </div>
 
           <DropdownMenuSeparator className="my-2" />
@@ -257,30 +239,17 @@ export default function Navbar() {
           <div className="flex flex-col gap-1 px-6">
             <span className="text-sm text-muted-foreground px-2">Theme</span>
             <div className="flex gap-2">
-              <Button
-                variant={theme === "light" ? "secondary" : "ghost"}
-                size="icon"
-                onClick={() => setTheme("light")}
-              >
-                <HugeiconsIcon icon={Sun03Icon} className="min-w-5" />
-                <span className="sr-only">Light</span>
-              </Button>
-              <Button
-                variant={theme === "dark" ? "secondary" : "ghost"}
-                size="icon"
-                onClick={() => setTheme("dark")}
-              >
-                <HugeiconsIcon icon={Moon02Icon} className="min-w-5" />
-                <span className="sr-only">Dark</span>
-              </Button>
-              <Button
-                variant={theme === "system" ? "secondary" : "ghost"}
-                size="icon"
-                onClick={() => setTheme("system")}
-              >
-                <HugeiconsIcon icon={LaptopIcon} className="min-w-5" />
-                <span className="sr-only">System</span>
-              </Button>
+              {THEME_OPTIONS.map(({ value, label, icon }) => (
+                <Button
+                  key={value}
+                  variant={theme === value ? "secondary" : "ghost"}
+                  size="icon"
+                  onClick={() => setTheme(value)}
+                >
+                  <HugeiconsIcon icon={icon} className="min-w-5" />
+                  <span className="sr-only">{label}</span>
+                </Button>
+              ))}
             </div>
           </div>
 
@@ -294,14 +263,7 @@ export default function Navbar() {
                   className="w-full justify-start"
                   onClick={() => handleMobileNavigate(`/profile/${user.id}`)}
                 >
-                  {user.imageUrl && user.imageUrl !== "" ? (
-                    <Avatar size="sm">
-                      <AvatarImage src={user.imageUrl} alt={user.displayName} />
-                      <AvatarFallback>{user.displayName}</AvatarFallback>
-                    </Avatar>
-                  ) : (
-                    <HugeiconsIcon icon={UserCircleIcon} className="text-primary min-w-5" />
-                  )}
+                  <UserAvatar imageUrl={user.imageUrl} displayName={user.displayName} />
                   {user.displayName}'s Profile
                 </Button>
                 <SheetClose asChild>

@@ -34,7 +34,12 @@ export default function AttendeeItem({ attendee }: Props) {
     <div className="flex gap-3 items-center my-2">
       <Avatar size="lg">
         <AvatarImage
-          src={attendee.user.imageUrl ?? defaultImage64}
+          src={
+            attendee?.user?.imageUrl?.replace(
+              "/upload/",
+              "/upload/w_30,h_30,c_fill,f_auto,dpr_2/"
+            ) ?? defaultImage64
+          }
           alt={attendee.user.displayName}
         />
         <AvatarFallback>{attendee.user.displayName}</AvatarFallback>

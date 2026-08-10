@@ -17,7 +17,13 @@ export function ProfileCard({ user }: Props) {
       <HoverCardTrigger asChild>
         <Link to={`/profile/${user.id}`}>
           <Avatar className="cursor-pointer" size="default">
-            <AvatarImage src={user.imageUrl ?? defaultImage64} alt="@shadcn" />
+            <AvatarImage
+              src={
+                user?.imageUrl?.replace("/upload/", "/upload/w_30,h_30,c_fill,f_auto,dpr_2/") ??
+                defaultImage64
+              }
+              alt="@shadcn"
+            />
             <AvatarFallback>{user.displayName}</AvatarFallback>
           </Avatar>
         </Link>
@@ -26,7 +32,10 @@ export function ProfileCard({ user }: Props) {
         <HoverCardContent className="flex w-50 flex-col gap-2 bg-popover/25 backdrop-blur-sm cursor-pointer">
           <Avatar className="w-full h-full">
             <AvatarImage
-              src={user.imageUrl ?? defaultImage64}
+              src={
+                user?.imageUrl?.replace("/upload/", "/upload/w_280,h_280,c_fill,f_auto,dpr_2/") ??
+                defaultImage64
+              }
               alt="@shadcn"
               className="rounded-lg"
             />

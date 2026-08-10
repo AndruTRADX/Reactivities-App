@@ -34,7 +34,13 @@ export function FollowUserRow({ user }: Props) {
     <div className="flex items-center justify-between gap-3">
       <Link to={`/profile/${user.id}`} className="flex items-center gap-3 min-w-0">
         <Avatar size="lg">
-          <AvatarImage src={user.imageUrl ?? defaultImage64} alt={user.displayName} />
+          <AvatarImage
+            src={
+              user?.imageUrl?.replace("/upload/", "/upload/w_30,h_30,c_fill,f_auto,dpr_2/") ??
+              defaultImage64
+            }
+            alt={user.displayName}
+          />
           <AvatarFallback>{user.displayName}</AvatarFallback>
         </Avatar>
         <div className="flex flex-col min-w-0">

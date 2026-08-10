@@ -42,7 +42,12 @@ export default function ActivityCard({ activity }: Props) {
       <div className="flex px-4 sm:px-7 gap-4 items-center">
         <Avatar className="w-16 h-16" onClick={() => navigate(`/profile/${activity.hostId}`)}>
           <AvatarImage
-            src={activity.hostImageUrl ?? defaultImage64}
+            src={
+              activity?.hostImageUrl?.replace(
+                "/upload/",
+                "/upload/w_120,h_120,c_fill,f_auto,dpr_2/"
+              ) ?? defaultImage64
+            }
             alt={activity.hostDisplayName}
           />
           <AvatarFallback>{activity.hostDisplayName}</AvatarFallback>
