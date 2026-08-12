@@ -21,8 +21,14 @@ export const activitySortLabels: Record<ActivitySort, string> = {
   categoryDesc: "Category (Z-A)",
 }
 
+export const activityFilterOptions = ["all", "going", "hosting"] as const
+
+export type ActivityFilter = (typeof activityFilterOptions)[number]
+
 export const activitySpecificationParamsSchema = pagedRequestSchema.extend({
   sort: z.enum(activitySortOptions).optional(),
+  imGoing: z.boolean().optional(),
+  imHosting: z.boolean().optional(),
 })
 
 export type ActivitySpecificationParams = z.infer<typeof activitySpecificationParamsSchema>

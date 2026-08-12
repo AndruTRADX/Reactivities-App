@@ -1,7 +1,9 @@
+import { useState } from "react"
 import { useGetActivities } from "./hooks/api/useActivities"
 import {
   activitySortLabels,
   activitySortOptions,
+  type ActivityFilter,
   type ActivitySort,
 } from "./schemas/request/ActivitySpecificationParams"
 import ActivityCard from "./components/ActivityCard"
@@ -23,13 +25,22 @@ export default function ActivityPage() {
     6
   )
 
+  const [filter, setFilter] = useState<ActivityFilter>("all")
+
   const { pagedActivities, isLoadingActivities, errorPagedActivities } = useGetActivities({
     pageIndex,
     pageSize,
     sort,
+    imGoing: filter === "going",
+    imHosting: filter === "hosting",
   })
 
   const activities = pagedActivities?.data ?? []
+
+  const handleFilterChange = (nextFilter: ActivityFilter) => {
+    setFilter(nextFilter)
+    setPageIndex(1)
+  }
 
   if (isLoadingActivities) {
     return <SkeletonPage />
@@ -58,7 +69,11 @@ export default function ActivityPage() {
           />
         </div>
 
-        <RadioGroup defaultValue="all" className="flex w-fit flex-row flex-wrap gap-3">
+        <RadioGroup
+          value={filter}
+          onValueChange={value => value && handleFilterChange(value as ActivityFilter)}
+          className="flex w-fit flex-row flex-wrap gap-3"
+        >
           <div className="flex items-center gap-1.5">
             <RadioGroupItem value="all" id="r1-mobile" />
             <Label htmlFor="r1-mobile">All</Label>
@@ -105,7 +120,11 @@ export default function ActivityPage() {
             />
           </div>
 
-          <RadioGroup defaultValue="all" className="w-fit">
+          <RadioGroup
+            value={filter}
+            onValueChange={value => value && handleFilterChange(value as ActivityFilter)}
+            className="w-fit"
+          >
             <div className="flex items-center gap-3">
               <RadioGroupItem value="all" id="r1" />
               <Label htmlFor="r1">All</Label>
