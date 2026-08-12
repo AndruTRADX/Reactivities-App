@@ -1,4 +1,3 @@
-import { Card, CardHeader, CardTitle } from "@sharedUi/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@sharedUi/tabs"
 import type { UserProfileResponse } from "@sharedSchemas/response/UserProfileResponse"
 import ProfilePhotosCard from "@profile/components/cards/photos/ProfilePhotosCard"
@@ -22,7 +21,6 @@ export default function ProfileContent({ profile }: Props) {
       >
         <TabsTrigger value="about">About</TabsTrigger>
         <TabsTrigger value="photos">Photos</TabsTrigger>
-        <TabsTrigger value="events">Events</TabsTrigger>
         <TabsTrigger value="followers">Followers</TabsTrigger>
         <TabsTrigger value="following">Following</TabsTrigger>
       </TabsList>
@@ -31,13 +29,6 @@ export default function ProfileContent({ profile }: Props) {
       </TabsContent>
       <TabsContent value="photos">
         <ProfilePhotosCard />
-      </TabsContent>
-      <TabsContent value="events">
-        <Card>
-          <CardHeader>
-            <CardTitle>Events</CardTitle>
-          </CardHeader>
-        </Card>
       </TabsContent>
       <TabsContent value="followers">
         <ProfileFollowersCard />
