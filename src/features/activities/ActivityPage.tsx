@@ -1,19 +1,12 @@
 import { useState } from "react"
 import { useGetActivities } from "./hooks/api/useActivities"
-import {
-  activitySortLabels,
-  activitySortOptions,
-  type ActivityFilter,
-  type ActivitySort,
-} from "./schemas/request/ActivitySpecificationParams"
+import type { ActivityFilter, ActivitySort } from "./schemas/request/ActivitySpecificationParams"
 import ActivityCard from "./components/ActivityCard"
+import { ActivityFilters } from "./components/ActivityFilters"
 import { SkeletonPage } from "./components/SkeletonPage"
 import { Card, CardContent, CardHeader, CardTitle } from "@sharedUi/card"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Filter } from "@hugeicons/core-free-icons"
-import { RadioGroup, RadioGroupItem } from "@sharedUi/radio-group"
-import { Label } from "@sharedUi/label"
-import { ComboboxSelect } from "@/shared/components/common/ComboboxSelect"
 import { NoContent } from "@/shared/components/common/NotFound"
 import { ErrorShow } from "@/shared/components/common/ErrorShow"
 import { PaginationControl } from "@/shared/components/common/PaginationControl"
@@ -50,55 +43,42 @@ export default function ActivityPage() {
     return <ErrorShow error={errorPagedActivities} />
   }
 
-  if (!activities || activities.length === 0) {
-    return <NoContent title="No activities" description={`Not activities have been created`} />
-  }
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
       <div className="flex flex-wrap items-center gap-4 rounded-2xl bg-card px-4 py-3 ring-1 ring-foreground/10 lg:hidden">
-        <div className="min-w-36 flex-1">
-          <ComboboxSelect
-            value={sort}
-            onValueChange={value => value && setSort(value as ActivitySort)}
-            placeholder="Default"
-            items={activitySortOptions.map(option => ({
-              label: activitySortLabels[option],
-              value: option,
-            }))}
-          />
-        </div>
-
-        <RadioGroup
-          value={filter}
-          onValueChange={value => value && handleFilterChange(value as ActivityFilter)}
-          className="flex w-fit flex-row flex-wrap gap-3"
-        >
-          <div className="flex items-center gap-1.5">
-            <RadioGroupItem value="all" id="r1-mobile" />
-            <Label htmlFor="r1-mobile">All</Label>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <RadioGroupItem value="going" id="r2-mobile" />
-            <Label htmlFor="r2-mobile">Going</Label>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <RadioGroupItem value="hosting" id="r3-mobile" />
-            <Label htmlFor="r3-mobile">Hosting</Label>
-          </div>
-        </RadioGroup>
-      </div>
-
-      <div className="flex flex-col lg:col-span-3 gap-4">
-        {activities.map(activity => (
-          <ActivityCard activity={activity} key={activity.id} />
-        ))}
-        <PaginationControl
-          pageIndex={pagedActivities?.pageIndex ?? pageIndex}
-          pageCount={pagedActivities?.pageCount ?? 1}
-          onPageChange={setPageIndex}
+        <ActivityFilters
+          variant="toolbar"
+          sort={sort}
+          filter={filter}
+          onSortChange={setSort}
+          onFilterChange={handleFilterChange}
         />
       </div>
+
+      {activities.length === 0 ? (
+        <div className="lg:col-span-3">
+          <NoContent
+            title="No activities"
+            description={
+              filter === "all"
+                ? "No activities have been created"
+                : "No activities match the selected filter"
+            }
+          />
+        </div>
+      ) : (
+        <div className="flex flex-col lg:col-span-3 gap-4">
+          {activities.map(activity => (
+            <ActivityCard activity={activity} key={activity.id} />
+          ))}
+          <PaginationControl
+            pageIndex={pagedActivities?.pageIndex ?? pageIndex}
+            pageCount={pagedActivities?.pageCount ?? 1}
+            onPageChange={setPageIndex}
+          />
+        </div>
+      )}
+
       <Card className="col-span-1 hidden h-fit lg:flex">
         <CardHeader>
           <CardTitle className="flex gap-2 font-semibold items-center">
@@ -107,37 +87,13 @@ export default function ActivityPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <Label>Sort by</Label>
-            <ComboboxSelect
-              value={sort}
-              onValueChange={value => value && setSort(value as ActivitySort)}
-              placeholder="Default"
-              items={activitySortOptions.map(option => ({
-                label: activitySortLabels[option],
-                value: option,
-              }))}
-            />
-          </div>
-
-          <RadioGroup
-            value={filter}
-            onValueChange={value => value && handleFilterChange(value as ActivityFilter)}
-            className="w-fit"
-          >
-            <div className="flex items-center gap-3">
-              <RadioGroupItem value="all" id="r1" />
-              <Label htmlFor="r1">All</Label>
-            </div>
-            <div className="flex items-center gap-3">
-              <RadioGroupItem value="going" id="r2" />
-              <Label htmlFor="r2">I'm going</Label>
-            </div>
-            <div className="flex items-center gap-3">
-              <RadioGroupItem value="hosting" id="r3" />
-              <Label htmlFor="r3">I'm hosting</Label>
-            </div>
-          </RadioGroup>
+          <ActivityFilters
+            variant="sidebar"
+            sort={sort}
+            filter={filter}
+            onSortChange={setSort}
+            onFilterChange={handleFilterChange}
+          />
         </CardContent>
       </Card>
     </div>
