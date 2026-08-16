@@ -1,7 +1,10 @@
 import { Skeleton } from "@sharedUi/skeleton"
 import { Card } from "@sharedUi/card"
+import { useLiquidGlass } from "@sharedHooks/useLiquidGlass"
 
 export function SkeletonPage() {
+  const { ref: glassRef, style: glassStyle } = useLiquidGlass<HTMLDivElement>()
+
   return (
     <div className="flex flex-col w-full gap-6">
       <div className="w-full flex flex-col">
@@ -9,7 +12,11 @@ export function SkeletonPage() {
 
         <div className="-mt-8 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="glass w-fit p-3.25 -translate-y-8 rounded-2xl bg-background/40 backdrop-blur-lg backdrop-saturate-150 inset-ring-1 inset-ring-glass-highlight/60 dark:inset-ring-glass-highlight/40">
+            <div
+              ref={glassRef}
+              style={glassStyle}
+              className="w-fit p-3.25 -translate-y-8 rounded-2xl bg-background/40"
+            >
               <Skeleton className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl" />
             </div>
 

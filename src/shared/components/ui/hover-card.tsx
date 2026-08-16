@@ -2,6 +2,7 @@ import * as React from "react"
 import { HoverCard as HoverCardPrimitive } from "radix-ui"
 
 import { cn } from "@/shared/lib/utils"
+import { useLiquidGlass } from "@sharedHooks/useLiquidGlass"
 
 function HoverCard({ ...props }: React.ComponentProps<typeof HoverCardPrimitive.Root>) {
   return <HoverCardPrimitive.Root data-slot="hover-card" {...props} />
@@ -17,14 +18,18 @@ function HoverCardContent({
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof HoverCardPrimitive.Content>) {
+  const { ref, style } = useLiquidGlass<HTMLDivElement>()
+
   return (
     <HoverCardPrimitive.Portal data-slot="hover-card-portal">
       <HoverCardPrimitive.Content
+        ref={ref}
         data-slot="hover-card-content"
         align={align}
         sideOffset={sideOffset}
+        style={style}
         className={cn(
-          "glass z-50 w-72 origin-(--radix-hover-card-content-transform-origin) rounded-2xl bg-popover/25 backdrop-blur-sm backdrop-saturate-150 p-4 text-sm text-popover-foreground shadow-2xl ring-1 ring-foreground/5 inset-ring-1 inset-ring-glass-highlight/60 dark:inset-ring-glass-highlight/40 outline-hidden duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          "z-50 w-72 origin-(--radix-hover-card-content-transform-origin) rounded-2xl bg-popover/25 p-4 text-sm text-popover-foreground shadow-2xl ring-1 ring-foreground/5 outline-hidden duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
         {...props}

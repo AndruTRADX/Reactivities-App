@@ -4,6 +4,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
 
 import { cn } from "@/shared/lib/utils"
+import { useLiquidGlass } from "@sharedHooks/useLiquidGlass"
 
 const buttonVariants = cva(
   "group/button inline-flex shrink-0 items-center justify-center rounded-4xl border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -21,13 +22,12 @@ const buttonVariants = cva(
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
         "glass-outline":
-          "glass bg-input/70 backdrop-blur-sm backdrop-saturate-150 inset-ring-1 inset-ring-glass-highlight/60 dark:inset-ring-glass-highlight/40 hover:bg-input/90 hover:text-foreground aria-expanded:bg-input aria-expanded:text-foreground",
-        "glass-default":
-          "glass [--glass-highlight:var(--glass-tint-highlight)] bg-primary/70 text-primary-foreground backdrop-blur-sm backdrop-saturate-150 inset-ring-1 inset-ring-primary/40 hover:bg-primary/90",
+          "bg-input/70 hover:bg-input/90 hover:text-foreground aria-expanded:bg-input aria-expanded:text-foreground",
+        "glass-default": "bg-primary/70 text-primary-foreground hover:bg-primary/90",
         "glass-secondary":
-          "glass bg-secondary/70 text-secondary-foreground backdrop-blur-sm backdrop-saturate-150 inset-ring-1 inset-ring-glass-highlight/60 dark:inset-ring-glass-highlight/40 hover:bg-secondary/90 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+          "bg-secondary/70 text-secondary-foreground hover:bg-secondary/90 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         "glass-destructive":
-          "glass [--glass-highlight:var(--glass-tint-highlight)] bg-destructive/10 text-destructive backdrop-blur-sm backdrop-saturate-150 inset-ring-1 inset-ring-destructive/40 hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
       },
       size: {
         default:
@@ -59,12 +59,17 @@ function Button({
     asChild?: boolean
   }) {
   const Comp = asChild ? Slot.Root : "button"
+  const { ref, style } = useLiquidGlass<HTMLButtonElement>({
+    enabled: typeof variant === "string" && variant.startsWith("glass"),
+  })
 
   return (
     <Comp
+      ref={ref}
       data-slot="button"
       data-variant={variant}
       data-size={size}
+      style={style}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />

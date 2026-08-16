@@ -29,7 +29,7 @@ export function ProfileCard({ user }: Props) {
         </Link>
       </HoverCardTrigger>
       <Link to={`/profile/${user.id}`}>
-        <HoverCardContent className="flex w-50 flex-col gap-2 bg-popover/25 backdrop-blur-sm cursor-pointer">
+        <HoverCardContent className="flex w-50 flex-col gap-2 cursor-pointer">
           <Avatar className="w-full h-full">
             <AvatarImage
               src={
