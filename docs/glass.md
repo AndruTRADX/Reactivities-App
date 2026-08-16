@@ -12,7 +12,7 @@ This document is the rulebook for the app's "glass" effect: which surfaces use i
 
 The effect is a real optical distortion, not a CSS approximation: `useLiquidGlass` (`src/shared/hooks/useLiquidGlass.ts`) generates an SVG `feDisplacementMap` filter shaped to the surface's own size and border-radius, and applies it through `backdrop-filter` — so it warps whatever is visible *behind* the surface, exactly like real glass bending light, while the surface's own content (text, icons, children) stays perfectly sharp. `backdrop-filter` only ever samples the backdrop, never the element's own painted content, so this is guaranteed by construction — no extra care is needed to keep menu text or button icons crisp.
 
-The math (`src/shared/lib/liquidGlass.ts`, `buildDisplacementMap`/`buildDisplacementFilter`) and the composed filter chain are a TypeScript port of [srdavo/liquid-glass](https://github.com/srdavo/liquid-glass). One preset (`LIQUID_GLASS_PRESET`) is used uniformly on every surface in the app — there's no per-surface tuning of blur/depth/strength/chromatic-aberration.
+The math (`src/shared/lib/liquidGlass.ts`, `buildDisplacementMap`/`buildDisplacementFilter`) and the composed filter chain are a TypeScript port of [srdavo/liquid-glass](https://github.com/srdavo/liquid-glass).
 
 **Using it on a component:**
 
@@ -22,11 +22,19 @@ const { ref, style } = useLiquidGlass<HTMLDivElement>()
 return <div ref={ref} style={style} className="rounded-2xl bg-popover/25 ..." />
 ```
 
-- `ref` goes on the actual DOM node that should distort its backdrop.
+- `ref` is a **callback ref** (required, not swappable for a plain object ref) — Radix's Presence-wrapped content (Popover, DropdownMenu, Select, Combobox, HoverCard, Dialog, AlertDialog) attaches/detaches its ref multiple times during its own open choreography, and a callback ref is what lets the hook always end up measuring the real, final node instead of possibly latching onto a transient `null`. Goes on the actual DOM node that should distort its backdrop.
 - `style` carries the computed `backdropFilter` (and a small inset `box-shadow` light-catching edge, using the `--glass-highlight` token) — spread it directly onto that same node.
 - Radius, width, and height are auto-detected from the live element (`ResizeObserver` + computed `border-radius`), so a caller never duplicates its own Tailwind rounding class as a JS number — just give the element a `rounded-*` class as usual.
 - On browsers without reliable SVG-filter support in `backdrop-filter` (non-Chromium), the hook automatically falls back to a plain `blur()` — no distortion, no chromatic aberration, but still a translucent, legible surface.
 - Pass `{ enabled: false }` to skip the effect entirely (e.g. `Button`'s non-`glass-*` variants call the hook unconditionally per the Rules of Hooks, but disable it for solid variants).
+- Pass `{ preset: "compact" }` for small/dense surfaces — see [Presets](#presets) below. Defaults to `"large"`.
+
+## Presets
+
+`LIQUID_GLASS_PRESETS` (`src/shared/lib/liquidGlass.ts`) has two entries, `large` (the default) and `compact`. They're identical except `blur`: `compact` is softer-focused than `large`. Everything else — `depth`/`strength`/`chromaticAberration`/`brightness`/`saturate` — stays the same between them, so the *character* of the distortion doesn't change, only how soft the surface reads at a glance. `compact` exists because the distortion alone reads as too subtle on small, dense surfaces at the shared `large` blur amount.
+
+- **`large`** (default, no option needed) — big, low-frequency surfaces: `Navbar`, `DialogContent`/`AlertDialogContent`, the profile avatar frame.
+- **`compact`** (`{ preset: "compact" }`) — small or content-dense surfaces: `PopoverContent`, `SelectContent`, `ComboboxContent`, `DropdownMenuContent`/`DropdownMenuSubContent`, `HoverCardContent`, and all four `glass-*` `Button` variants.
 
 **The `bg-<token>/<opacity>` background is still required** — the hook only supplies the distortion/blur, not the tint. Pick the background token from the table below; it's the surface's actual glass color, independent of the distortion mechanism.
 
@@ -51,7 +59,7 @@ This is the pattern for every bounded floating surface in `src/shared/components
 
 **The `--glass-highlight` token** (`styles.css`, `:root`/`.dark`, per the [Colors rule](./theming.md#colors-one-source-of-truth)) is the one piece of the old recipe still in use: it colors the hook's inset box-shadow (the light-catching edge). Unlike `primary`/`destructive`, it isn't content-semantic — it represents a simulated light reflection, so it stays a near-white translucency in both themes rather than inverting.
 
-**When adding a new floating component — including a `Switch`/`Toggle` if one gets added later:** call `useLiquidGlass`, attach `ref`/`style`, add a `rounded-*` class and a background token per the table above.
+**When adding a new floating component — including a `Switch`/`Toggle` if one gets added later:** call `useLiquidGlass`, attach `ref`/`style`, add a `rounded-*` class and a background token per the table above, and pick whichever preset the closest existing surface in that table uses — don't invent a third preset without a concrete visual reason the two existing ones don't cover.
 
 ## Full-bleed scrims
 
@@ -59,6 +67,6 @@ A small number of surfaces use `backdrop-blur` without the rest of the glass tre
 
 ## Summary checklist
 
-- [ ] Every bounded floating surface (popover, dropdown, combobox/select, modal card, navbar) calls `useLiquidGlass`, spreads its `ref`/`style` onto the surface, and keeps a `bg-<token>/<opacity>` background per the table above.
+- [ ] Every bounded floating surface (popover, dropdown, combobox/select, modal card, navbar) calls `useLiquidGlass` with the right preset (`compact` for small/dense surfaces, `large` otherwise), spreads its `ref`/`style` onto the surface, and keeps a `bg-<token>/<opacity>` background per the table above.
 - [ ] Full-bleed scrims (dialog overlays, hero-image scrims) stay plain blur, no `useLiquidGlass`.
 - [ ] The host element carries its own `rounded-*` class — radius is auto-detected from it, not passed as a prop.

@@ -1,3 +1,14 @@
+// `depth` sets the width of the surface's distortion edge. A number is a fixed px
+// width; `{ percent }` scales it to the surface's own size (percent of its shorter
+// side), so the edge stays proportionally sized instead of a fixed px reading too
+// thick on a small surface or too thin on a large one.
+export type LiquidGlassDepth = number | { percent: number }
+
+export function resolveDepth(depth: LiquidGlassDepth, width: number, height: number) {
+  if (typeof depth === "number") return depth
+  return (depth.percent / 100) * Math.min(width, height)
+}
+
 interface DisplacementMapParams {
   width: number
   height: number
@@ -146,13 +157,28 @@ export function detectLiquidGlassSupport() {
   return svgFilterSupport
 }
 
-// Mirrors the reference repo's own example configuration (srdavo/liquid-glass README),
-// applied uniformly to every surface in the app rather than tiered by surface size.
-export const LIQUID_GLASS_PRESET = {
-  depth: 5,
-  blur: 1,
-  strength: 40,
-  chromaticAberration: 2,
-  brightness: 1.1,
-  saturate: 1.5,
+// "large" is for big, low-frequency surfaces (navbar, dialogs, the profile avatar
+// frame). "compact" is for small/dense ones (Select, Combobox, Popover, DropdownMenu,
+// HoverCard, glass-* buttons) — a softer blur and a thinner edge so the distortion
+// still reads at that size. `strength`/`chromaticAberration` stay the same between the
+// two, so only the softness and edge width change, not the distortion's character.
+export const LIQUID_GLASS_PRESETS = {
+  large: {
+    depth: 5,
+    blur: 1,
+    strength: 40,
+    chromaticAberration: 2,
+    brightness: 1.1,
+    saturate: 1.5,
+  },
+  compact: {
+    depth: 2,
+    blur: 3,
+    strength: 40,
+    chromaticAberration: 2,
+    brightness: 1.1,
+    saturate: 1.5,
+  },
 } as const
+
+export type LiquidGlassPreset = keyof typeof LIQUID_GLASS_PRESETS

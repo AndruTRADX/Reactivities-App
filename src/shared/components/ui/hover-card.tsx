@@ -18,7 +18,7 @@ function HoverCardContent({
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof HoverCardPrimitive.Content>) {
-  const { ref, style } = useLiquidGlass<HTMLDivElement>()
+  const { ref, style } = useLiquidGlass<HTMLDivElement>({ preset: "compact" })
 
   return (
     <HoverCardPrimitive.Portal data-slot="hover-card-portal">

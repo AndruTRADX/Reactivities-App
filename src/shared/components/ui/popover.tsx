@@ -18,7 +18,7 @@ function PopoverContent({
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
-  const { ref, style } = useLiquidGlass<HTMLDivElement>()
+  const { ref, style } = useLiquidGlass<HTMLDivElement>({ preset: "compact" })
 
   return (
     <PopoverPrimitive.Portal>

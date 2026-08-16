@@ -66,7 +66,7 @@ function SelectContent({
   align = "center",
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
-  const { ref, style } = useLiquidGlass<HTMLDivElement>()
+  const { ref, style } = useLiquidGlass<HTMLDivElement>({ preset: "compact" })
 
   return (
     <SelectPrimitive.Portal>

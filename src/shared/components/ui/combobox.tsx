@@ -96,7 +96,7 @@ function ComboboxContent({
     ComboboxPrimitive.Positioner.Props,
     "side" | "align" | "sideOffset" | "alignOffset" | "anchor"
   >) {
-  const { ref, style } = useLiquidGlass<HTMLDivElement>()
+  const { ref, style } = useLiquidGlass<HTMLDivElement>({ preset: "compact" })
 
   return (
     <ComboboxPrimitive.Portal>

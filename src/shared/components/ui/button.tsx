@@ -61,6 +61,7 @@ function Button({
   const Comp = asChild ? Slot.Root : "button"
   const { ref, style } = useLiquidGlass<HTMLButtonElement>({
     enabled: typeof variant === "string" && variant.startsWith("glass"),
+    preset: "compact",
   })
 
   return (

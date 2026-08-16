@@ -2,7 +2,9 @@ import { useCallback, useMemo, useRef, useState, type CSSProperties } from "reac
 import {
   buildDisplacementFilter,
   detectLiquidGlassSupport,
-  LIQUID_GLASS_PRESET,
+  LIQUID_GLASS_PRESETS,
+  resolveDepth,
+  type LiquidGlassPreset,
 } from "@/shared/lib/liquidGlass"
 
 interface GlassSize {
@@ -13,10 +15,12 @@ interface GlassSize {
 
 interface UseLiquidGlassOptions {
   enabled?: boolean
+  preset?: LiquidGlassPreset
 }
 
 export function useLiquidGlass<T extends HTMLElement>({
   enabled = true,
+  preset = "large",
 }: UseLiquidGlassOptions = {}) {
   const [size, setSize] = useState<GlassSize | null>(null)
   const observerRef = useRef<ResizeObserver | null>(null)
@@ -40,25 +44,22 @@ export function useLiquidGlass<T extends HTMLElement>({
     })
   }, [])
 
-  // A callback ref (not an object ref) is required here: Radix's Presence-wrapped
-  // content (Dialog, Popover, DropdownMenu, Select, Combobox, HoverCard, AlertDialog)
-  // attaches/detaches its ref multiple times during mount as part of its own open
-  // choreography — an object ref read once inside a `[enabled]`-keyed useLayoutEffect
-  // can catch a transient null and never recover, while a callback ref re-measures on
-  // every attach, so it always ends up wired to whatever the final node is.
+  // A callback ref, not an object ref: Radix's Presence-wrapped content (Dialog,
+  // Popover, DropdownMenu, Select, Combobox, HoverCard, AlertDialog) attaches/detaches
+  // this ref multiple times during its own open choreography, and a callback ref
+  // re-measures on every attach so it always ends up wired to the final node.
   //
-  // Radix's `Slot` (`asChild`) recreates its internal composed-ref function on every
-  // render (it isn't memoized), which forces React to detach+reattach our ref on every
-  // render of an `asChild` consumer even though the underlying DOM node never changed.
-  // Two guards keep that from ever becoming a render loop:
-  //  - `lastElRef` short-circuits a reattach of the *same* node into a true no-op —
-  //    the detach call in between doesn't clear it, so a same-node detach+reattach
-  //    pair (always synchronous) never reaches the teardown logic below.
-  //  - genuine detaches (a real unmount, or `enabled` flipping false) are deferred one
-  //    microtask via `detachTokenRef`, so if a same-node reattach *does* land first,
-  //    the stale detach is skipped instead of tearing down a still-live observer.
-  //  - measuring is further coalesced onto a single rAF, so even a burst of distinct
-  //    reattaches in one tick (Presence's own mount choreography) produces one measurement.
+  // Radix's `Slot` (`asChild`) also recreates its composed-ref function on every
+  // render, forcing a detach+reattach on every render of an `asChild` consumer even
+  // when the DOM node hasn't changed. Two guards keep that from becoming a render loop:
+  //  - `lastElRef` turns a same-node reattach into a no-op — the detach call in
+  //    between doesn't clear it, so a same-node detach+reattach pair never reaches
+  //    the teardown logic below.
+  //  - a genuine detach (a real unmount, or `enabled` flipping false) is deferred one
+  //    microtask via `detachTokenRef`, so a same-node reattach that lands first
+  //    cancels the stale detach instead of tearing down a still-live observer.
+  //  - measuring is coalesced onto a single rAF, so a burst of reattaches in one tick
+  //    produces one measurement, not several.
   const ref = useCallback(
     (el: T | null) => {
       detachTokenRef.current++
@@ -102,7 +103,8 @@ export function useLiquidGlass<T extends HTMLElement>({
   const style = useMemo<CSSProperties>(() => {
     if (!enabled || !size || size.width === 0 || size.height === 0) return {}
 
-    const { blur, strength, chromaticAberration, depth, brightness, saturate } = LIQUID_GLASS_PRESET
+    const { blur, strength, chromaticAberration, depth, brightness, saturate } =
+      LIQUID_GLASS_PRESETS[preset]
 
     if (!detectLiquidGlassSupport()) {
       return { backdropFilter: `blur(${blur * 2}px)` }
@@ -112,7 +114,7 @@ export function useLiquidGlass<T extends HTMLElement>({
       width: size.width,
       height: size.height,
       radius: size.radius,
-      depth,
+      depth: resolveDepth(depth, size.width, size.height),
       strength,
       chromaticAberration,
     })
@@ -122,7 +124,7 @@ export function useLiquidGlass<T extends HTMLElement>({
       boxShadow:
         "inset 1px 1px 1px 0 var(--glass-highlight), inset -1px -1px 1px 0 var(--glass-highlight)",
     }
-  }, [enabled, size])
+  }, [enabled, size, preset])
 
   return { ref, style }
 }
