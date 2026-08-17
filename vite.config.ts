@@ -18,4 +18,9 @@ export default defineConfig({
       "@sharedSchemas": path.resolve(__dirname, "./src/shared/schemas/"),
     },
   },
+  build: {
+    outDir: "../ReactivitiesApi/Reactivities.API/wwwroot",
+    chunkSizeWarningLimit: 1500,
+    emptyOutDir: true,
+  },
 })
